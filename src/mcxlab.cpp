@@ -1,5 +1,8 @@
 ////////////////////////////////////////////////////////////////////////////////
 //
+//  Acousto-Optic MCX (AO-MCX) - Matt Adams <adamsm2@bu.edu>
+//
+//	Written based on:
 //  Monte Carlo eXtreme (MCX)  - GPU accelerated 3D Monte Carlo transport simulation
 //  Author: Qianqian Fang <fangq at nmr.mgh.harvard.edu>
 //
@@ -31,6 +34,7 @@ void mcx_set_field(const mxArray *root,const mxArray *item,int idx, Config *cfg)
 void mcx_validate_config(Config *cfg);
 void mcxlab_usage();
 
+// MTA NOTE: I HAVE NOT INCORPORATED THE MATLAB FUNCTION INTO AO-MCX
 void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]){
   Config cfg;
   mxArray    *tmp;
@@ -245,9 +249,14 @@ void mcx_validate_config(Config *cfg){
         mexErrMsgTxt("you must define the 'prop' field in the input structure");
      if(cfg->dim.x==0||cfg->dim.y==0||cfg->dim.z==0)
         mexErrMsgTxt("the 'vol' field in the input structure can not be empty");
+        
+     if(cfg->steps.x!=1.f && cfg->unitinmm==1.f){
+     	cfg->unitinmm=cfg->steps.x;
+     	cfg->steps.x=1.f;cfg->steps.y=1.f;cfg->steps.z=1.f;
+     }   
 
      if(cfg->unitinmm!=1.f){
-        for(i=1;i<cfg->medianum;i++){
+     	for(i=1;i<cfg->medianum;i++){
 		cfg->prop[i].mus*=cfg->unitinmm;
 		cfg->prop[i].mua*=cfg->unitinmm;
         }

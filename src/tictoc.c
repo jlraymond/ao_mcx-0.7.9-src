@@ -1,5 +1,8 @@
 /*******************************************************************************
 **
+**  Acousto-Optic MCX (AO-MCX) - Matt Adams <adamsm2@bu.edu>
+**
+**	Written based on:
 **  Monte Carlo eXtreme (MCX)  - GPU accelerated Monte Carlo 3D photon migration
 **  Author: Qianqian Fang <fangq at nmr.mgh.harvard.edu>
 **
@@ -17,9 +20,10 @@
 #include "tictoc.h"
 
 #ifndef USE_OS_TIMER
-#include <cuda.h>
-#include <driver_types.h>
-#include <cuda_runtime_api.h>
+// MTA these are all specific to the BU eng grid
+#include </ad/eng/support/software/linux/all/x86_64/cuda/cuda-4.0/include/cuda.h>
+#include </ad/eng/support/software/linux/all/x86_64/cuda/cuda-4.0/include/driver_types.h>
+#include </ad/eng/support/software/linux/all/x86_64/cuda/cuda-4.0/include/cuda_runtime_api.h>
 /* use CUDA timer */
 static cudaEvent_t timerStart, timerStop;
 

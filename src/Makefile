@@ -10,19 +10,19 @@ ifeq ($(BACKEND),ocelot)
   CC?=g++
 endif
 
-CUDACC=nvcc
+CUDACC=/ad/eng/support/software/linux/all/x86_64/cuda/cuda/bin/nvcc
 AR=$(CC)
 
 BINARY=mcx
 OUTPUT_DIR=../bin
 
-INCLUDEDIRS=-I/usr/local/cuda/include
+INCLUDEDIRS=-I/ad/eng/support/software/linux/all/x86_64/cuda/cuda/include/
 
 ifeq ($(BACKEND),ocelot)
   LINKOPT=-L/usr/local/lib `OcelotConfig -l`
   CUCCOPT=-arch compute_20 #--maxrregcount 32
 else
-  LINKOPT=-L/usr/local/cuda/lib -lcudart
+  LINKOPT=-L/ad/eng/support/software/linux/all/x86_64/cuda/cuda/lib64 -lcudart
   CUCCOPT=#-arch compute_11 #--maxrregcount 32
 endif
 
@@ -46,7 +46,7 @@ else
   ifeq ($(findstring x86_64,$(ARCH)), x86_64)
      ifeq "$(wildcard /usr/local/cuda/lib64)" "/usr/local/cuda/lib64"
         ifeq ($(BACKEND),cuda)
-           LINKOPT=-L/usr/local/cuda/lib64 -lcudart
+           LINKOPT=-L/ad/eng/support/software/linux/all/x86_64/cuda/cuda/lib64 -lcudart
         endif
      endif
   endif

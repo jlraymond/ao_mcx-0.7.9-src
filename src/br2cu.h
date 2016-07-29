@@ -4,11 +4,13 @@
 /***********************************************************
 Translation unit for BrookGPU to CUDA
 
+This has not been tested with AO-MCX
+
 Qianqian Fang <fangq nmr.mgh.harvard.edu>
 
 ************************************************************/
 
-#include <cuda.h>
+#include </ad/eng/support/software/linux/all/x86_64/cuda/cuda-4.0/include/cuda.h>
 
 #define kernel __global__
 #define streamRead(a,b)  {size_t sy;cudaGetSymbolSize(&sy,b);printf("ss %d\n",sy);cudaMemcpy(a, b[0], sy, \

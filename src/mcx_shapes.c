@@ -1,5 +1,8 @@
 /*******************************************************************************
 **
+**  Acousto-Optic MCX (AO-MCX) - Matt Adams <adamsm2@bu.edu>
+**
+**	Written based on:
 **  Monte Carlo eXtreme (MCX)  - GPU accelerated 3D Monte Carlo transport simulation
 **  Author: Qianqian Fang <fangq at nmr.mgh.harvard.edu>
 **
@@ -21,6 +24,8 @@
 In this unit, we load and parse a JSON-formatted shape file,
 rasterize the 3D objects and subsequently add to a voxelated volume.
 *******************************************************************************/
+
+//NOTE: THIS HAS NOT BEEN TESTED WITH AO-MCX!!!
 
 #include <stdio.h>
 #include <string.h>

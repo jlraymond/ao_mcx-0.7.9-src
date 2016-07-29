@@ -3,6 +3,7 @@
 
 #include "mcx_utils.h"
 
+
 #ifdef  __cplusplus
 extern "C" {
 #endif
@@ -17,13 +18,28 @@ extern "C" {
 #define GPUDEBUG(x)
 #endif
 
+
 typedef float4 MCXpos;
 
+//MTA new structure
+typedef struct MCXAcoustO{
+	float Pncosi;
+	float Pnsini;
+	float Pdcosj;
+	float Pdsinj;
+}MCXAO;
+
+//MTA new structure
+typedef struct MCXModulation{
+	float magnitude;
+	float phi;	
+}Modulation;
+
 typedef struct MCXDir{
-        float x; /*directional vector of the photon, unit-less*/
+    float x; /*directional vector of the photon, unit-less*/
 	float y;
 	float z;
-        float nscat; /*total number of scattering events*/
+    float nscat; /*total number of scattering events*/
 }MCXdir;
 
 typedef struct MCXTimer{
@@ -53,9 +69,12 @@ typedef union GProperty{
         float4 v;
 }Gprop;
 
+
 typedef unsigned char uchar;
+typedef unsigned short ushort;	//MTA Added 6/26/12
 
 typedef struct  __align__(16) KernelParams {
+  float gridunit;
   float3 vsize;
   float  minstep;
   float  twin0,twin1,tmax;

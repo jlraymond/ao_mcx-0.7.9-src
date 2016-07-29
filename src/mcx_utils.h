@@ -2,9 +2,11 @@
 #define _MCEXTREME_UTILITIES_H
 
 #include <stdio.h>
-#include <vector_types.h>
+// Specific to BU eng grid
+#include </ad/eng/support/software/linux/all/x86_64/cuda/cuda-4.2/include/vector_types.h>
 #include "br2cu.h"
 #include "cjson/cJSON.h"
+
 
 #define MAX_PATH_LENGTH     1024
 #define MAX_SESSION_LENGTH  255
@@ -17,12 +19,36 @@
 #define MIN(a,b)           ((a)<(b)?(a):(b))
 #define MAX(a,b)           ((a)>(b)?(a):(b))
 
+
+
 typedef struct MCXMedium{
 	float mua;
 	float mus;
 	float g;
 	float n;
 } Medium;
+
+//MTA new structure
+typedef struct MCXAcoustics{
+	float Px;  // x component of pressure (Mag(P)*ihat)
+	float Py;
+	float Pz;
+	float USphase;
+} Acoustics;
+
+//MTA new structure
+typedef struct MCXAconstants{
+	float rho;		// mass density of medium 
+	float va;		// speed of sound in medium
+	float f;		//acoustic source frequency
+} Aconstants;
+
+//MTA new structure
+typedef struct MCXOconstants{
+	float lambda;		// wavelength in vacuum
+	float nu;		// elasto-optic coefficient
+} Oconstants;
+//////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 typedef struct MCXHistoryHeader{
 	char magic[4];
@@ -37,10 +63,11 @@ typedef struct MCXHistoryHeader{
 	int reserved[7];
 } History;
 
+
 typedef struct MCXConfig{
 	int nphoton;      /*total simulated photon number*/
 	//int totalmove;   /* [depreciated] total move per photon*/
-        unsigned int nblocksize;   /*thread block size*/
+    unsigned int nblocksize;   /*thread block size*/
 	unsigned int nthread;      /*num of total threads, multiple of 128*/
 	int seed;         /*random number generator seed*/
 
@@ -58,11 +85,14 @@ typedef struct MCXConfig{
 	unsigned int detnum;       /*total detector numbers*/
 	unsigned int maxdetphoton; /*anticipated maximum detected photons*/
 	float detradius;  /*detector radius*/
-        float sradius;    /*source region radius: if set to non-zero, accumulation 
+    float sradius;    /*source region radius: if set to non-zero, accumulation 
                             will not perform for dist<sradius; this can reduce
                             normalization error when using non-atomic write*/
 
+	Aconstants *Acon;		//MTA
+	Oconstants *Ocon;		// AO constants MTA
 	Medium *prop;     /*optical property mapping table*/
+	Acoustics *pressure;		/*Pointer to the voxel-dependent acoustic variables*/
 	float4 *detpos;   /*detector positions and radius, overwrite detradius*/
 
 	unsigned int maxgate;        /*simultaneous recording gates*/
@@ -74,29 +104,32 @@ typedef struct MCXConfig{
 	char session[MAX_SESSION_LENGTH]; /*session id, a string*/
 	char isrowmajor;    /*1 for C-styled array in vol, 0 for matlab-styled array*/
 	char isreflect;     /*1 for reflecting photons at boundary,0 for exiting*/
-        char isref3;        /*1 considering maximum 3 ref. interfaces; 0 max 2 ref*/
-        char isrefint;   /*1 to consider reflections at internal boundaries; 0 do not*/
+    char isref3;        /*1 considering maximum 3 ref. interfaces; 0 max 2 ref*/
+    char isrefint;   /*1 to consider reflections at internal boundaries; 0 do not*/
 	char isnormalized;  /*1 to normalize the fluence, 0 for raw fluence*/
 	char issavedet;     /*1 to count all photons hits the detectors*/
 	char issave2pt;     /*1 to save the 2-point distribution, 0 do not save*/
 	char isgpuinfo;     /*1 to print gpu info when attach, 0 do not print*/
-        char issrcfrom0;    /*1 do not subtract 1 from src/det positions, 0 subtract 1*/
-        char isdumpmask;    /*1 dump detector mask; 0 not*/
+    char issrcfrom0;    /*1 do not subtract 1 from src/det positions, 0 subtract 1*/
+    char isdumpmask;    /*1 dump detector mask; 0 not*/
 	char autopilot;     /*1 optimal setting for dedicated card, 2, for non dedicated card*/
-        float minenergy;    /*minimum energy to propagate photon*/
+    float minenergy;    /*minimum energy to propagate photon*/
 	float unitinmm;     /*defines the length unit in mm for grid*/
-        FILE *flog;         /*stream handle to print log information*/
-        History his;        /*header info of the history file*/
-	float *exportfield;     /*memory buffer when returning the flux to external programs such as matlab*/
+    FILE *flog;         /*stream handle to print log information*/
+    History his;        /*header info of the history file*/
+	float *exportfield0;     /*memory buffer when returning the flux to external programs such as matlab*/
+	float *exportfield1;     /*memory buffer when returning the flux to external programs such as matlab*/
 	float *exportdetected;  /*memory buffer when returning the partial length info to external programs such as matlab*/
-        char rootpath[MAX_PATH_LENGTH]; /*sets the input and output root folder*/
+    char rootpath[MAX_PATH_LENGTH]; /*sets the input and output root folder*/
         char *shapedata;    /*a pointer points to a string defining the JSON-formatted shape data*/
 } Config;
 
 #ifdef	__cplusplus
 extern "C" {
 #endif
-void mcx_savedata(float *dat, int len, int doappend, char *suffix, Config *cfg);
+
+//MTA.
+void mcx_savedata(float *dat, int len, int doappend, char *suffix, Config *cfg, char *fieldnum);
 void mcx_error(const int id,const char *msg,const char *file,const int linenum);
 void mcx_loadconfig(FILE *in, Config *cfg);
 void mcx_saveconfig(FILE *in, Config *cfg);
@@ -107,6 +140,7 @@ void mcx_clearcfg(Config *cfg);
 void mcx_parsecmd(int argc, char* argv[], Config *cfg);
 void mcx_usage(char *exename);
 void mcx_loadvolume(char *filename,Config *cfg);
+void mcx_loadacoustics(char *filename,Config *cfg);	//MTA
 void mcx_normalize(float field[], float scale, int fieldlen);
 int  mcx_readarg(int argc, char *argv[], int id, void *output,const char *type);
 void mcx_printlog(Config *cfg, char *str);

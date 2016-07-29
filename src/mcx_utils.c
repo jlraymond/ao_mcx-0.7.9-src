@@ -1,5 +1,8 @@
 /*******************************************************************************
 **
+**  Acousto-Optic MCX (AO-MCX) - Matt Adams <adamsm2@bu.edu>
+**
+**	Written based on:
 **  Monte Carlo eXtreme (MCX)  - GPU accelerated 3D Monte Carlo transport simulation
 **  Author: Qianqian Fang <fangq at nmr.mgh.harvard.edu>
 **
@@ -12,6 +15,7 @@
 **
 **  License: GNU General Public License v3, see LICENSE.txt for details
 **
+**	Changes from MCX are marked with //MTA
 *******************************************************************************/
 
 #include <stdio.h>
@@ -32,6 +36,9 @@
                                 ((tmp=cJSON_GetObjectItem(root,idfull))==0 ? NULL : tmp) \
                      : tmp)
 
+
+//MTA. These are the tags for the command line options.
+// It may be good to add an option to perform an optical simulation only w/o acoustics
 const char shortopt[]={'h','i','f','n','t','T','s','a','g','b','B','z','u','H','P',
                  'd','r','S','p','e','U','R','l','L','I','o','G','M','A','E','v','\0'};
 const char *fullopt[]={"--help","--interactive","--input","--photon",
@@ -41,7 +48,10 @@ const char *fullopt[]={"--help","--interactive","--input","--photon",
                  "--repeat","--save2pt","--printlen","--minenergy",
                  "--normalize","--skipradius","--log","--listgpu",
                  "--printgpu","--root","--gpu","--dumpmask","--autopilot","--seed","--version",""};
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+
+//MTA. These are the default settings.
 void mcx_initcfg(Config *cfg){
      cfg->medianum=0;
      cfg->detnum=0;
@@ -64,9 +74,12 @@ void mcx_initcfg(Config *cfg){
      cfg->respin=1;
      cfg->issave2pt=1;
      cfg->isgpuinfo=0;
+	 cfg->Acon=NULL;		//MTA
+	 cfg->Ocon=NULL;		//MTA
      cfg->prop=NULL;
-     cfg->detpos=NULL;
+	 cfg->detpos=NULL;
      cfg->vol=NULL;
+     cfg->pressure=NULL;	//MTA
      cfg->session[0]='\0';
      cfg->printnum=0;
      cfg->minenergy=0.f;
@@ -80,7 +93,8 @@ void mcx_initcfg(Config *cfg){
      cfg->maxdetphoton=1000000;
      cfg->autopilot=0;
      cfg->seed=0;
-     cfg->exportfield=NULL;
+     cfg->exportfield0=NULL;
+     cfg->exportfield1=NULL;
      cfg->exportdetected=NULL;
      /*cfg->his=(History){{'M','C','X','H'},1,0,0,0,0,0,0,1.f,{0,0,0,0,0,0,0}};*/
      memset(&cfg->his,0,sizeof(History));
@@ -90,21 +104,33 @@ void mcx_initcfg(Config *cfg){
      cfg->shapedata=NULL;
 }
 
+
+
+//MTA. Clears the config file when called 
 void mcx_clearcfg(Config *cfg){
      if(cfg->medianum)
-     	free(cfg->prop);
-     if(cfg->detnum)
+		free(cfg->prop);
+		free(cfg->Acon);	//MTA
+		free(cfg->Ocon);	//MTA
+	 if(cfg->detnum)
      	free(cfg->detpos);
      if(cfg->dim.x && cfg->dim.y && cfg->dim.z)
         free(cfg->vol);
-
+		free(cfg->pressure);	//MTA
+		
      mcx_initcfg(cfg);
 }
 
-void mcx_savedata(float *dat, int len, int doappend, char *suffix, Config *cfg){
+//MTA. Identifies  data that needs to be save and saves it 
+void mcx_savedata(float *dat, int len, int doappend, char *suffix, Config *cfg, char *fieldnum){
      FILE *fp;
      char name[MAX_PATH_LENGTH];
-     sprintf(name,"%s.%s",cfg->session,suffix);
+     if(strcmp(fieldnum,"none")==0){
+     	sprintf(name,"%s.%s",cfg->session,suffix);
+     }else{
+	 	sprintf(name,"%s_%s.%s",cfg->session,fieldnum,suffix);
+	 }	
+	 	    
      if(doappend){
         fp=fopen(name,"ab");
      }else{
@@ -116,16 +142,18 @@ void mcx_savedata(float *dat, int len, int doappend, char *suffix, Config *cfg){
      if(strcmp(suffix,"mch")==0){
 	fwrite(&(cfg->his),sizeof(History),1,fp);
      }
-     fwrite(dat,sizeof(float),len,fp);
+     fwrite(dat,sizeof(float),len,fp);  
      fclose(fp);
 }
 
+//MTA. This just prints the simulation log in the command window. 
 void mcx_printlog(Config *cfg, char *str){
      if(cfg->flog>0){ /*stdout is 1*/
          fprintf(cfg->flog,"%s\n",str);
      }
 }
 
+//MTA. Normalizes a field by some scale
 void mcx_normalize(float field[], float scale, int fieldlen){
      int i;
      for(i=0;i<fieldlen;i++){
@@ -133,6 +161,7 @@ void mcx_normalize(float field[], float scale, int fieldlen){
      }
 }
 
+//MTA. Prints out messages for certain errors 
 void mcx_error(const int id,const char *msg,const char *file,const int linenum){
      fprintf(stdout,"\nMCX ERROR(%d):%s in unit %s:%d\n",id,msg,file,linenum);
      if(id==-CUDA_ERROR_LAUNCH_TIMEOUT){
@@ -147,10 +176,12 @@ URL: http://mcx.sf.net/cgi-bin/index.cgi?Doc/FAQ\n");
 #endif
 }
 
+//MTA. Erroring function.  Makes sure the proper number of optical properties, etc. have been entered by the user
 void mcx_assert(int ret){
      if(!ret) mcx_error(ret,"assert error",__FILE__,__LINE__);
 }
 
+//MTA. Reads config files.
 void mcx_readconfig(char *fname, Config *cfg){
      if(fname[0]==0){
      	mcx_loadconfig(stdin,cfg);
@@ -199,6 +230,7 @@ void mcx_readconfig(char *fname, Config *cfg){
      }
 }
 
+//MTA. Writes to a config file.
 void mcx_writeconfig(char *fname, Config *cfg){
      if(fname[0]==0)
      	mcx_saveconfig(stdout,cfg);
@@ -210,21 +242,30 @@ void mcx_writeconfig(char *fname, Config *cfg){
      }
 }
 
-void mcx_prepdomain(char *filename, Config *cfg){
+
+//MTA. Configures simulation domain based on volume bin file (eg. semi60x60x60.bin).
+void mcx_prepdomain(char *op_filename, char *ac_filename, Config *cfg){
      int idx1d;
-     if(filename[0] || cfg->vol){
+     if(op_filename[0] || cfg->vol){
         if(cfg->vol==NULL){
-	     mcx_loadvolume(filename,cfg);
-	     if(cfg->shapedata && strstr(cfg->shapedata,":")!=NULL){
+	    	mcx_loadvolume(op_filename,cfg);
+	     	if(cfg->shapedata && strstr(cfg->shapedata,":")!=NULL){
                   int status;
-     		  Grid3D grid={&(cfg->vol),&(cfg->dim),{1.f,1.f,1.f},cfg->isrowmajor};
-        	  if(cfg->issrcfrom0) memset(&(grid.orig.x),0,sizeof(float3));
-		  status=mcx_parse_shapestring(&grid,cfg->shapedata);
-		  if(status){
-		      MCX_ERROR(status,mcx_last_shapeerror());
-		  }
-	     }
-	}
+     		  	  Grid3D grid={&(cfg->vol),&(cfg->dim),{1.f,1.f,1.f},cfg->isrowmajor};
+        	  	  if(cfg->issrcfrom0) memset(&(grid.orig.x),0,sizeof(float3));
+		  			status=mcx_parse_shapestring(&grid,cfg->shapedata);
+		  		  if(status){
+		      		MCX_ERROR(status,mcx_last_shapeerror());
+		  		  }
+	     	 }
+		}
+	 //MTA		
+	 if(ac_filename[0] || cfg->pressure){
+        if(cfg->pressure==NULL){
+	     mcx_loadacoustics(ac_filename,cfg);
+		}
+	 }
+	
 	if(cfg->isrowmajor){
 		/*from here on, the array is always col-major*/
 		mcx_convertrow2col(&(cfg->vol), &(cfg->dim));
@@ -233,7 +274,7 @@ void mcx_prepdomain(char *filename, Config *cfg){
 	if(cfg->issavedet)
 		mcx_maskdet(cfg);
 	if(cfg->srcpos.x<0.f || cfg->srcpos.y<0.f || cfg->srcpos.z<0.f || 
-	   cfg->srcpos.x>=cfg->dim.x || cfg->srcpos.y>=cfg->dim.y || cfg->srcpos.z>=cfg->dim.z)
+		cfg->srcpos.x>=cfg->dim.x || cfg->srcpos.y>=cfg->dim.y || cfg->srcpos.z>=cfg->dim.z)
 		mcx_error(-4,"source position is outside of the volume",__FILE__,__LINE__);
 	idx1d=(int)(floor(cfg->srcpos.z)*cfg->dim.y*cfg->dim.x+floor(cfg->srcpos.y)*cfg->dim.x+floor(cfg->srcpos.x));
 
@@ -259,10 +300,11 @@ void mcx_prepdomain(char *filename, Config *cfg){
 }
 
 
+//MTA. This sets the input parameters for the simulation.
 void mcx_loadconfig(FILE *in, Config *cfg){
      uint i,gates,itmp;
      float dtmp;
-     char filename[MAX_PATH_LENGTH]={0}, comment[MAX_PATH_LENGTH],*comm;
+     char op_filename[MAX_PATH_LENGTH]={0}, ac_filename[MAX_PATH_LENGTH]={0}, comment[MAX_PATH_LENGTH],*comm;
      
      if(in==stdin)
      	fprintf(stdout,"Please specify the total number of photons: [1000000]\n\t");
@@ -307,31 +349,48 @@ void mcx_loadconfig(FILE *in, Config *cfg){
      if(cfg->maxgate>gates)
 	 cfg->maxgate=gates;
 
-     mcx_assert(fscanf(in,"%s", filename)==1);
+     mcx_assert(fscanf(in,"%s", op_filename)==1);
      if(cfg->rootpath[0]){
 #ifdef WIN32
-         sprintf(comment,"%s\\%s",cfg->rootpath,filename);
+         sprintf(comment,"%s\\%s",cfg->rootpath,op_filename);
 #else
-         sprintf(comment,"%s/%s",cfg->rootpath,filename);
+         sprintf(comment,"%s/%s",cfg->rootpath,op_filename);
 #endif
-         strncpy(filename,comment,MAX_PATH_LENGTH);
+         strncpy(op_filename,comment,MAX_PATH_LENGTH);
+     }
+     comm=fgets(comment,MAX_PATH_LENGTH,in);
+     
+     if(in==stdin)
+     	fprintf(stdout,"%s\nPlease specify the path to the Acoustics binary file:\n\t",
+                                   op_filename);
+     mcx_assert(fscanf(in,"%s", ac_filename)==1);
+     if(cfg->rootpath[0]){
+#ifdef WIN32
+         sprintf(comment,"%s\\%s",cfg->rootpath,ac_filename);
+#else
+         sprintf(comment,"%s/%s",cfg->rootpath,ac_filename);
+#endif
+         strncpy(ac_filename,comment,MAX_PATH_LENGTH);
      }
      comm=fgets(comment,MAX_PATH_LENGTH,in);
 
      if(in==stdin)
-     	fprintf(stdout,"%s\nPlease specify the x voxel size (in mm), x dimension, min and max x-index [1.0 100 1 100]:\n\t",filename);
+     	fprintf(stdout,"%s\nPlease specify the x voxel size (in mm), x dimension, min and max x-index [1.0 100 1 100]:\n\t",ac_filename);
      mcx_assert(fscanf(in,"%f %d %d %d", &(cfg->steps.x),&(cfg->dim.x),&(cfg->crop0.x),&(cfg->crop1.x))==4);
      comm=fgets(comment,MAX_PATH_LENGTH,in);
 
      if(cfg->steps.x!=cfg->steps.y || cfg->steps.y!=cfg->steps.z)
         mcx_error(-9,"MCX currently does not support anisotropic voxels",__FILE__,__LINE__);
-
-     if(cfg->steps.x!=1.f && cfg->unitinmm==1.f)
+	 
+	 //MTA		
+     if(cfg->steps.x!=1.f && cfg->unitinmm==1.f){
         cfg->unitinmm=cfg->steps.x;
-
-     if(cfg->unitinmm!=1.f){
-        cfg->steps.x=cfg->unitinmm; cfg->steps.y=cfg->unitinmm; cfg->steps.z=cfg->unitinmm;
+        cfg->steps.x=1.f;cfg->steps.y=1.f;cfg->steps.z=1.f;
      }
+
+     /*if(cfg->unitinmm!=1.f){
+        cfg->steps.x=cfg->unitinmm; cfg->steps.y=cfg->unitinmm; cfg->steps.z=cfg->unitinmm;
+     }*/
 
      if(in==stdin)
      	fprintf(stdout,"%f %d %d %d\nPlease specify the y voxel size (in mm), y dimension, min and max y-index [1.0 100 1 100]:\n\t",
@@ -361,30 +420,57 @@ void mcx_loadconfig(FILE *in, Config *cfg){
            nothing need to change here.
         */
      }
+     
+     //MTA.
      if(in==stdin)
-     	fprintf(stdout,"%f %d %d %d\nPlease specify the total types of media:\n\t",
+     	fprintf(stdout,"%f %d %d %d\nPlease specify mass density (kg/m^3), speed of sound (m/s), source frequency (hz): [1000.0 1500.0 1100000.0]:\n\t",
                                   cfg->steps.z,cfg->dim.z,cfg->crop0.z,cfg->crop1.z);
+        cfg->Acon=(Aconstants*)malloc(sizeof(Aconstants));	//MTA
+     	mcx_assert(fscanf(in,"%f %f %f", &(cfg->Acon[0].rho),&(cfg->Acon[0].va),&(cfg->Acon[0].f))==3); //MTA
+     	comm=fgets(comment,MAX_PATH_LENGTH,in);//MTA
+     	if(cfg->Acon[0].f < 1e3) //MTA Change frequency if entered in MHz
+     		cfg->Acon[0].f *= 1e6;   //MTA  
+
+     if(in==stdin)
+     	fprintf(stdout,"%f %f %f\nPlease specify optical wavelength in vacuum (nm) and elasto-optic coefficient: [1064.0 0.32]:\n\t",
+                                  cfg->Acon[0].rho,cfg->Acon[0].va,cfg->Acon[0].f);	//MTA
+        cfg->Ocon=(Oconstants*)malloc(sizeof(Oconstants));	//MTA
+     	mcx_assert(fscanf(in,"%f %f", &(cfg->Ocon[0].lambda),&(cfg->Ocon[0].nu))==2);	//MTA
+     	comm=fgets(comment,MAX_PATH_LENGTH,in);	//MTA
+     	
+     	if(cfg->Ocon[0].lambda > 1)	//MTA Adjust if entered in nm
+     		cfg->Ocon[0].lambda /= 1e9;      //MTA
+     
+     ///////////////////////////////////////////////////////////////////////////////////////
+     
+     if(in==stdin)
+     	fprintf(stdout,"%f %f\nPlease specify the total types of media:\n\t",
+                                  cfg->Ocon[0].lambda,cfg->Ocon[0].nu);
      mcx_assert(fscanf(in,"%d", &(cfg->medianum))==1);
      cfg->medianum++;
      if(cfg->medianum>MAX_PROP)
-         mcx_error(-4,"input media types exceed the maximum (255)",__FILE__,__LINE__);
+         mcx_error(-4,"input media types exceed the maximum (255)",__FILE__,__LINE__); //MTA.
      comm=fgets(comment,MAX_PATH_LENGTH,in);
 
-     if(in==stdin)
-     	fprintf(stdout,"%d\n",cfg->medianum);
+	 if(in==stdin)
+	 	fprintf(stdout,"%d\n",cfg->medianum);
+	 	
      cfg->prop=(Medium*)malloc(sizeof(Medium)*cfg->medianum);
+		
      cfg->prop[0].mua=0.f; /*property 0 is already air*/
      cfg->prop[0].mus=0.f;
      cfg->prop[0].g=1.f;
      cfg->prop[0].n=1.f;
+
      for(i=1;i<cfg->medianum;i++){
         if(in==stdin)
-		fprintf(stdout,"Please define medium #%d: mus(1/mm), anisotropy, mua(1/mm) and refractive index: [1.01 0.01 0.04 1.37]\n\t",i);
+			fprintf(stdout,"Please define medium #%d: mus(1/mm), anisotropy, mua(1/mm), and refractive index: [1.01 0.01 0.04 1.37]\n\t",i);
      	mcx_assert(fscanf(in, "%f %f %f %f", &(cfg->prop[i].mus),&(cfg->prop[i].g),&(cfg->prop[i].mua),&(cfg->prop[i].n))==4);
-        comm=fgets(comment,MAX_PATH_LENGTH,in);
+		comm=fgets(comment,MAX_PATH_LENGTH,in);
         if(in==stdin)
-		fprintf(stdout,"%f %f %f %f\n",cfg->prop[i].mus,cfg->prop[i].g,cfg->prop[i].mua,cfg->prop[i].n);
+			fprintf(stdout,"Optical Properties %f %f %f %f \n",cfg->prop[i].mus,cfg->prop[i].g,cfg->prop[i].mua,cfg->prop[i].n);
      }
+     
      if(cfg->unitinmm!=1.f){
          for(i=1;i<cfg->medianum;i++){
 		cfg->prop[i].mus*=cfg->unitinmm;
@@ -415,12 +501,13 @@ void mcx_loadconfig(FILE *in, Config *cfg){
         if(in==stdin)
 		fprintf(stdout,"%f %f %f\n",cfg->detpos[i].x,cfg->detpos[i].y,cfg->detpos[i].z);
      }
-     mcx_prepdomain(filename,cfg);
+     mcx_prepdomain(op_filename,ac_filename,cfg);
      cfg->his.maxmedia=cfg->medianum-1; /*skip media 0*/
      cfg->his.detnum=cfg->detnum;
-     cfg->his.colcount=cfg->medianum+1; /*column count=maxmedia+2*/
+     cfg->his.colcount=cfg->medianum+3;  //MTA
 }
 
+// JSON NOT UPDATED FOR AO-MCX!!!
 int mcx_loadjson(cJSON *root, Config *cfg){
      int i;
      cJSON *Domain, *Optode, *Forward, *Session, *Shapes, *tmp, *subitem;
@@ -430,7 +517,9 @@ int mcx_loadjson(cJSON *root, Config *cfg){
      Session = cJSON_GetObjectItem(root,"Session");
      Forward = cJSON_GetObjectItem(root,"Forward");
      Shapes  = cJSON_GetObjectItem(root,"Shapes");
-
+     
+     //char FOO;
+     
      if(Domain){
         char volfile[MAX_PATH_LENGTH];
 	cJSON *meds,*val;
@@ -499,12 +588,15 @@ int mcx_loadjson(cJSON *root, Config *cfg){
 	if(cfg->steps.x!=cfg->steps.y || cfg->steps.y!=cfg->steps.z)
            mcx_error(-9,"MCX currently does not support anisotropic voxels",__FILE__,__LINE__);
 
-	if(cfg->steps.x!=1.f && cfg->unitinmm==1.f)
+	//MTA
+	if(cfg->steps.x!=1.f && cfg->unitinmm==1.f){
            cfg->unitinmm=cfg->steps.x;
+           cfg->steps.x=1.f;cfg->steps.y=1.f;cfg->steps.z=1.f;
+    }
 
-	if(cfg->unitinmm!=1.f){
+/*	if(cfg->unitinmm!=1.f){
            cfg->steps.x=cfg->unitinmm; cfg->steps.y=cfg->unitinmm; cfg->steps.z=cfg->unitinmm;
-	}
+	}*/
 	val=FIND_JSON_OBJ("CacheBoxP0","Domain.CacheBoxP0",Domain);
 	if(val){
 	   if(cJSON_GetArraySize(val)>=3){
@@ -633,13 +725,14 @@ int mcx_loadjson(cJSON *root, Config *cfg){
      }else if(Shapes){
          MCX_ERROR(-1,"You can not specify both Domain.VolumeFile and Shapes sections");
      }
-     mcx_prepdomain(filename,cfg);
+     //mcx_prepdomain(filename,FOO,cfg);
      cfg->his.maxmedia=cfg->medianum-1; /*skip media 0*/
      cfg->his.detnum=cfg->detnum;
-     cfg->his.colcount=cfg->medianum+1; /*column count=maxmedia+2*/
+     cfg->his.colcount=cfg->medianum+3; /*column count=maxmedia+2*/  //MTA
      return 0;
 }
 
+//MTA. Saves a file detailing the config. I'M NOT SURE IF THIS WORKS WITH AO-MCX
 void mcx_saveconfig(FILE *out, Config *cfg){
      uint i;
 
@@ -652,6 +745,10 @@ void mcx_saveconfig(FILE *out, Config *cfg){
      fprintf(out,"%f %d %d %d\n", (cfg->steps.y),(cfg->dim.y),(cfg->crop0.y),(cfg->crop1.y));
      fprintf(out,"%f %d %d %d\n", (cfg->steps.z),(cfg->dim.z),(cfg->crop0.z),(cfg->crop1.z));
      fprintf(out,"%d\n", (cfg->medianum));
+	// fprintf(out,"%f %f %f\n", (cfg->Acon.rho),(cfg->Acon.va),(cfg->Acon.f));	//MTA added 6/27/12
+	 //fprintf(out,"%f %f\n", (cfg->.lambda),(cfg->.nu));	//MTA added 6/26/12, changed 6/27/12
+
+
      for(i=0;i<cfg->medianum;i++){
      	fprintf(out, "%f %f %f %f\n", (cfg->prop[i].mus),(cfg->prop[i].g),(cfg->prop[i].mua),(cfg->prop[i].n));
      }
@@ -660,7 +757,8 @@ void mcx_saveconfig(FILE *out, Config *cfg){
      	fprintf(out, "%f %f %f %f\n", (cfg->detpos[i].x),(cfg->detpos[i].y),(cfg->detpos[i].z),(cfg->detpos[i].w));
      }
 }
-
+ 
+//MTA. This sets up the simulation domain based on the volume binary file (eg. semi60x60x60.bin).
 void mcx_loadvolume(char *filename,Config *cfg){
      unsigned int i,datalen,res;
      FILE *fp;
@@ -696,11 +794,63 @@ void mcx_loadvolume(char *filename,Config *cfg){
      }
 }
 
+// MTA This entire sub-function was written by me
+void mcx_loadacoustics(char *filename,Config *cfg){
+     unsigned int i,j,k,index,datalen,res;
+     FILE *fp;
+     
+     unsigned int current_pos=0;
+     
+     fp=fopen(filename,"rb");
+     if(fp==NULL){
+     	     mcx_error(-5,"the specified binary acoustics file does not exist",__FILE__,__LINE__);
+     }
+     if(cfg->pressure){
+     	     free(cfg->pressure);
+     	     cfg->pressure=NULL;
+     }
+     
+     datalen=cfg->dim.x*cfg->dim.y*cfg->dim.z;
+     float * my_data = (float *)malloc(datalen*4*sizeof(float));
+     cfg->pressure = (Acoustics*)malloc(datalen*sizeof(Acoustics));
+     
+     res=fread( my_data, sizeof(float), datalen*4, fp);
+     if(res!=datalen*4){
+     	 mcx_error(-6,"file size does not match specified dimensions",__FILE__,__LINE__);
+     }
+     
+     for( k =0; k < cfg->dim.z; ++k){
+		for( j =0; j < cfg->dim.y; ++j){
+			for( i =0; i < cfg->dim.x; ++i){
+					index =  cfg->dim.x*cfg->dim.y*k + cfg->dim.x*j + i;
+					cfg->pressure[current_pos].Px = my_data[index];
+	 				cfg->pressure[current_pos].Py = my_data[datalen + index];
+					cfg->pressure[current_pos].Pz = my_data[datalen*2 + index];
+					cfg->pressure[current_pos].USphase = my_data[datalen*3 + index];
+					
+					/*if(i<10 && j==0 && k==0)
+						printf("%f\t%f\t%f\t%f\n", cfg->pressure[current_pos].Px, cfg->pressure[current_pos].Py, cfg->pressure[current_pos].Pz, cfg->pressure[current_pos].USphase );*/
+											
+					current_pos = current_pos+1;
+				}
+			}
+		} 
+     
+     fclose(fp);
+     
+     free(my_data);
+     
+     /*for(i=0;i<datalen;i++){
+         if(sqrtf(cfg->pressure[i].Px*cfg->pressure[i].Px+cfg->pressure[i].Py*cfg->pressure[i].Py+cfg->pressure[i].Pz*cfg->pressure[i].Pz)<0.01f)
+            mcx_error(-6,"cfg->pressure isn't set properly",__FILE__,__LINE__);
+     }*/
+}
+
 void  mcx_convertrow2col(unsigned char **vol, uint3 *dim){
      uint x,y,z;
      unsigned int dimxy,dimyz;
      unsigned char *newvol=NULL;
-     
+          
      if(*vol==NULL || dim->x==0 || dim->y==0 || dim->z==0){
      	return;
      }     
@@ -716,6 +866,8 @@ void  mcx_convertrow2col(unsigned char **vol, uint3 *dim){
      *vol=newvol;
 }
 
+
+//MTA. This function determines which boundary voxels are used as "detectors" (given a detector input)
 void  mcx_maskdet(Config *cfg){
      uint d,dx,dy,dz,idx1d,zi,yi,c,count;
      float x,y,z,ix,iy,iz,rx,ry,rz,d2,mind2,d2max;
@@ -810,6 +962,7 @@ void  mcx_maskdet(Config *cfg){
      free(padvol);
 }
 
+//MTA. I'm really not sure what's going on here.
 int mcx_readarg(int argc, char *argv[], int id, void *output,const char *type){
      /*
          when a binary option is given without a following number (0~1), 
@@ -833,6 +986,8 @@ int mcx_readarg(int argc, char *argv[], int id, void *output,const char *type){
      }
      return id+1;
 }
+
+//MTA. Again, no idea. Some function that looks for errors in the config file.
 int mcx_remap(char *opt){
     int i=0;
     while(shortopt[i]!='\0'){
@@ -845,16 +1000,19 @@ int mcx_remap(char *opt){
     }
     return 1;
 }
+
+//MTA. Parses input config file or command line options.  Maybe add an option here for AO in the future.
 void mcx_parsecmd(int argc, char* argv[], Config *cfg){
      int i=1,isinteractive=1,issavelog=0;
      char filename[MAX_PATH_LENGTH]={0};
      char logfile[MAX_PATH_LENGTH]={0};
      float np=0.f;
-
+//MTA. Outputs text with instructions detailing how to use MCX
      if(argc<=1){
      	mcx_usage(argv[0]);
      	exit(0);
      }
+//MTA. Error Message
      while(i<argc){
      	    if(argv[i][0]=='-'){
 		if(argv[i][1]=='-'){
@@ -996,15 +1154,19 @@ void mcx_version(Config *cfg){
     exit(0);
 }
 
+//MTA. Just prints text with instructions on how to use MCX.
 void mcx_usage(char *exename){
      printf("\
 ###############################################################################\n\
-#                      Monte Carlo eXtreme (MCX) -- CUDA                      #\n\
-#     Copyright (c) 2009-2012 Qianqian Fang <fangq at nmr.mgh.harvard.edu>    #\n\
-#                                                                             #\n\
+#               Acousto-Optic Monte Carlo eXtreme (AO-MCX) -- CUDA            #\n\
+#   Orig. Copyright (c) 2009-2012 Qianqian Fang <fangq@nmr.mgh.harvard.edu>   #\n\
 #    Martinos Center for Biomedical Imaging, Massachusetts General Hospital   #\n\
+#																			  #\n\
+#				  AO-MCX Created by Matt Adams <adamsm2@bu.edu>       		  #\n\
+#								Boston University							  #\n\
+#									   2013									  #\n\
 ###############################################################################\n\
-$MCX $Rev:: 272 $ Last Commit $Date:: 2012-01-14 13:47:46#$ by $Author:: fangq$\n\
+$MCX-AOI $Rev:: 2 $ Last Commit $Date:: 2014-03-21 $ by $Author:: adamsm2$\n\
 ###############################################################################\n\
 \n\
 usage: %s <param1> <param2> ...\n\
@@ -1023,7 +1185,6 @@ where possible parameters include (the first item in [] is the default value)\n\
  -g [1|int]    (--gategroup)   number of time gates per run\n\
  -b [1|0]      (--reflect)     1 to reflect photons at ext. boundary;0 to exit\n\
  -B [0|1]      (--reflectin)   1 to reflect photons at int. boundary; 0 do not\n\
- -e [0.|float] (--minenergy)   minimum energy level to terminate a photon\n\
  -R [0.|float] (--skipradius)  cached zone radius from source to use atomics\n\
  -u [1.|float] (--unitinmm)    defines the length unit for the grid edge\n\
  -U [1|0]      (--normalize)   1 to normalize flux to unitary; 0 save raw\n\
@@ -1036,8 +1197,7 @@ where possible parameters include (the first item in [] is the default value)\n\
  -l            (--log)         print messages to a log file instead\n\
  -L            (--listgpu)     print GPU information only\n\
  -I            (--printgpu)    print GPU information and run program\n\
- -P '{...}'    (--shapes)      a JSON string for additional shapes in the grid\n\
- -v            (--version)     print MCX revision number\n\
+ -v            (--version)     print MCX-AOI revision number\n\
 example:\n\
        %s -A -n 1e7 -f input.inp -G 1 \n\
 or\n\

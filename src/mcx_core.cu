@@ -1,5 +1,10 @@
 ////////////////////////////////////////////////////////////////////////////////
 //
+//  Acousto-Optic MCX (AO-MCX) - Matt Adams <adamsm2@bu.edu>
+//
+//	Edits are marked with //MTA
+//
+//	Written based on:
 //  Monte Carlo eXtreme (MCX)  - GPU accelerated 3D Monte Carlo transport simulation                                                                                                
 //  Author: Qianqian Fang <fangq at nmr.mgh.harvard.edu>
 //
@@ -11,13 +16,13 @@
 //  mcx_core.cu: GPU kernels and CUDA host code
 //
 //  License: GNU General Public License v3, see LICENSE.txt for details
-//
 ////////////////////////////////////////////////////////////////////////////////
 
 #include "br2cu.h"
 #include "mcx_core.h"
 #include "tictoc.h"
 #include "mcx_const.h"
+#include "/ad/eng/support/software/linux/all/x86_64/cuda/cuda-4.2/include/math_functions.h" //MTA
 
 #ifdef USE_MT_RAND
 #include "mt_rand_s.cu"     // use Mersenne Twister RNG (MT)
@@ -25,10 +30,19 @@
 #include "logistic_rand.cu" // use Logistic Lattice ring 5 RNG (LL5)
 #endif
 
-// optical properties saved in the constant memory
+// Optical properties saved in the constant memory
 // {x}:mua,{y}:mus,{z}:anisotropy (g),{w}:refractive index (n)
 __constant__ float4 gproperty[MAX_PROP];
-
+// Acoustic field saved in global memory
+// {x}:Px,{y}:Py,{z}:Pz,{w}:Ultrasound Phase (Phi)
+__device__ float4 gmedia_acous[MAX_VOXELS]; //MTA
+// Acoustic constants saved in constant memory
+// {x}:rho,{y}:speed of sound (va),{z}:Acoustic frequency (f)
+__constant__ float3 gAcon; //MTA
+// Optical constants used for AO calculations saved in constant memory
+// {x}:wavelength in vacuum (lambda), {y}: elasto-optic coefficient (nu)
+__constant__ float2 gOcon; //MTA
+// {x,y,z,radius}
 __constant__ float4 gdetpos[MAX_DETECTORS];
 
 // kernel constant parameters
@@ -37,10 +51,11 @@ __constant__ MCXParam gcfg[1];
 extern __shared__ float sharedmem[]; //max 64 tissue types when block size=64
 
 // tested with texture memory for media, only improved 1% speed
-// to keep code portable, use global memory for now
-// also need to change all media[idx1d] to tex1Dfetch() below
+// to keep code portable, use global memory
+// also need to change all media[idx1d] to tex1Dfetch() below (Q Fang)
 //texture<uchar, 1, cudaReadModeElementType> texmedia;
 
+  
 __device__ inline void atomicadd(float* address, float value){
 
 #if __CUDA_ARCH__ >= 200 // for Fermi, atomicAdd supports floats
@@ -58,12 +73,14 @@ __device__ inline void atomicadd(float* address, float value){
 
 }
 
+//MTA. Sets all values in any array to zero.
 __device__ inline void clearpath(float *p,int maxmediatype){
       uint i;
       for(i=0;i<maxmediatype;i++)
       	   p[i]=0.f;
 }
 
+//MTA. Clears GPU "cache" (shared or texture) of length len
 __device__ inline void clearcache(float *p,int len){
       uint i;
       if(threadIdx.x==0)
@@ -71,6 +88,7 @@ __device__ inline void clearcache(float *p,int len){
       	   p[i]=0.f;
 }
 
+//MTA. Not used unless passed the option to use it.  It forces atomic operation to some box near the source. Not tested for AO-MCX
 #ifdef  USE_CACHEBOX
 __device__ inline void savecache(float *data,float *cache){
       uint x,y,z;
@@ -85,6 +103,7 @@ __device__ inline void savecache(float *data,float *cache){
 }
 #endif
 
+//MTA. This sets every detector voxel equal to the detector number. (Others are 0)
 #ifdef SAVE_DETECTORS
 __device__ inline uint finddetector(MCXpos *p0){
       uint i;
@@ -98,58 +117,83 @@ __device__ inline uint finddetector(MCXpos *p0){
       return 0;
 }
 
-__device__ inline void savedetphoton(float n_det[],uint *detectedphoton,float weight,float *ppath,MCXpos *p0){
+//MTA. Saves photon variables when they reach a detector
+__device__ inline void savedetphoton(float n_det[],uint *detectedphoton,float weight,Modulation *Modulations, float *ppath,MCXpos *p0){  //MTA Changed 6/18/12,6/20/12
       uint j,baseaddr=0;
       j=finddetector(p0);
       if(j){
 	 baseaddr=atomicAdd(detectedphoton,1);
+	 // MTA. These parameters are variables carried by the photon the whole way
 	 if(baseaddr<gcfg->maxdetphoton){
-	    baseaddr*=gcfg->maxmedia+2;
-	    n_det[baseaddr++]=j;
-	    n_det[baseaddr++]=weight;
+	    baseaddr*=gcfg->maxmedia+4;  //MTA. Change the last integer to be the # of photon specific variables you need to save
+	    n_det[baseaddr++]=j;		// MTA. This is the detector number
+	    n_det[baseaddr++]=weight;  //MTA. The "weight" variable here is actually total number of scattering events.
+		n_det[baseaddr++]=Modulations->magnitude;  //MTA Magnitude of phase modulations
+		n_det[baseaddr++]=Modulations->phi;  	//MTA Phase angle of phase modulations
+		//MTA. Photon parameter for each media type
 	    for(j=0;j<gcfg->maxmedia;j++){
 		n_det[baseaddr+j]=ppath[j]; // save partial pathlength to the memory
-	    }
+		}
 	 }
       }
 }
+
 #endif
 
-__device__ inline void launchnewphoton(MCXpos *p,MCXdir *v,MCXtime *f,Medium *prop,uint *idx1d,
-           uchar *mediaid,uchar isdet, float ppath[],float energyloss[],float n_det[],uint *dpnum){
+
+//MTA. Launches a new photon
+__device__ inline void launchnewphoton(MCXpos *p,MCXdir *v,MCXtime *f,MCXAO *ao_sums, Modulation *mod, 
+		Medium *prop,Acoustics *pressure, Aconstants *Acon, Oconstants *Ocon, uint *idx1d,		//MTA
+        uchar *mediaid,uchar isdet, float ppath[],float energyloss[],float n_det[],uint *dpnum) {		//MTA
 
       *energyloss+=p->w;  // sum all the remaining energy
+      
+
 #ifdef SAVE_DETECTORS
       // let's handle detectors here
       if(gcfg->savedet){
          if(*mediaid==0 && isdet)
-	      savedetphoton(n_det,dpnum,v->nscat,ppath,p);
-	 clearpath(ppath,gcfg->maxmedia);
+	     savedetphoton(n_det,dpnum,v->nscat,mod,ppath,p);  //MTA
+	 clearpath(ppath,gcfg->maxmedia);			
       }
 #endif
-      *((float4*)p)=gcfg->ps;
+
+ 	  *((float4*)p)=gcfg->ps;
       *((float4*)v)=gcfg->c0;
       *((float4*)f)=float4(0.f,0.f,gcfg->minaccumtime,f->ndone+1);
+      *((float2*)mod)=float2(0.f,0.f);  		//MTA
+	  *((float4*)ao_sums)=float4(0.f,0.f,0.f,0.f);  //MTA
       *idx1d=gcfg->idx1dorig;
       *mediaid=gcfg->mediaidorig;
       *((float4*)(prop))=gproperty[*mediaid]; //always use mediaid to read gproperty[]
+	  //MTA added all below
+	  if(mediaid!=0){
+     	*((float4*)(pressure))=gmedia_acous[*idx1d]; 
+      }else{*((float4*)(pressure))=float4(0.f,0.f,0.f,0.f);}	
+	  *((float3*)(Acon))=gAcon;
+  	  *((float2*)(Ocon))=gOcon;
+	
 }
+
+
 
 /**
    this is the core Monte Carlo simulation kernel, please see Fig. 1 in Fang2009
    everything in the GPU kernels is in grid-unit. To convert back to length, use
    cfg->unitinmm (scattering/absorption coeff, T, speed etc)
 */
-kernel void mcx_main_loop(int nphoton,int ophoton,uchar media[],float field[],
-     float genergy[],uint n_seed[],float4 n_pos[],float4 n_dir[],float4 n_len[],
-     float n_det[], uint *detectedphoton){
+kernel void mcx_main_loop(int nphoton,int ophoton,uchar media[],float4 media_acous[], float field0[],		//MTA
+     float field1[], float genergy[],uint n_seed[],float4 n_pos[],float4 n_dir[],float4 n_len[],
+     float n_det[], float4 n_AO_sums[], float2 n_mod[], uint *detectedphoton){		//MTA
 
      int idx= blockDim.x * blockIdx.x + threadIdx.x;
 
      MCXpos  p,p0;//{x,y,z}: coordinates in grid unit, w:packet weight
      MCXdir  v;   //{x,y,z}: unitary direction vector in grid unit, nscat:total scat event
      MCXtime f;   //pscat: remaining scattering probability,t: photon elapse time, 
-                  //tnext: next accumulation time, ndone: completed photons
+	 MCXAO	ao_sums;  //MTA AO properties for each photon
+	 Modulation mod;	//MTA Tracks AO phase modulation terms
+
      float  energyloss=genergy[idx<<1];
      float  energyabsorbed=genergy[(idx<<1)+1];
 
@@ -159,18 +203,25 @@ kernel void mcx_main_loop(int nphoton,int ophoton,uchar media[],float field[],
 #ifdef TEST_RACING
      int cc=0;
 #endif
-     uchar  mediaid,mediaidold;
-     char   medid=-1;
+
+     uchar  mediaid,mediaidold;	//MTA changed 6/26/12 to accomodate more medium types
+     char   medid=-1;		
      float  atten;         //can be taken out to minimize registers
      float  n1;   //reflection var
 
      //for MT RNG, these will be zero-length arrays and be optimized out
      RandType t[RAND_BUF_LEN],tnew[RAND_BUF_LEN];
      Medium prop;    //can become float2 if no reflection (mua/musp is in 1/grid unit)
+	 Acoustics pressure;  //MTA
+ 	 Aconstants Acon;	//MTA
+	 Oconstants Ocon;	//MTA
 
      float len,cphi,sphi,theta,stheta,ctheta,tmp0,tmp1;
+	 float rPmag,Pmag,xdiff,ydiff,zdiff, dot_a_o, cosj_inc, sinj_inc, cosi_inc, sini_inc; //MTA
 
      float *ppath=sharedmem;
+
+//MTA.  CACHEBOX only used for atomic operations. NOT TESTED FOR AO-MCX
 #ifdef  USE_CACHEBOX
   #ifdef  SAVE_DETECTORS
      float *cachebox=sharedmem+(gcfg->savedet ? blockDim.x*gcfg->maxmedia: 0);
@@ -182,12 +233,18 @@ kernel void mcx_main_loop(int nphoton,int ophoton,uchar media[],float field[],
      float accumweight=0.f;
 #endif
 
+
 #ifdef  SAVE_DETECTORS
-     ppath=sharedmem+threadIdx.x*gcfg->maxmedia;
+     ppath=sharedmem+threadIdx.x*gcfg->maxmedia;  //MTA
 #endif
+
+
      *((float4*)(&p))=n_pos[idx];
      *((float4*)(&v))=n_dir[idx];
      *((float4*)(&f))=n_len[idx];
+	 *((float4*)(&ao_sums))=n_AO_sums[idx];  //MTA
+	 *((float2*)(&mod))=n_mod[idx];  //MTA
+
 
      gpu_rng_init(t,tnew,n_seed,idx);
      if(gcfg->savedet) clearpath(ppath,gcfg->maxmedia);
@@ -199,9 +256,17 @@ kernel void mcx_main_loop(int nphoton,int ophoton,uchar media[],float field[],
      if(mediaid==0) {
           return; // the initial position is not within the medium
      }
-     *((float4*)(&prop))=gproperty[mediaid]; //always use mediaid to read gproperty[]
 
-     /*
+	
+     *((float4*)(&prop))=gproperty[mediaid]; //always use mediaid to read gproperty - MTA. This sets the prop equal to the medium properties.
+     //MTA Added all below
+     if(mediaid!=0){
+     	*((float4*)(&pressure))=gmedia_acous[idx1d];
+     }else{*((float4*)(&pressure))=float4(0.f,0.f,0.f,0.f);}
+	 *((float3*)(&Acon))=gAcon;
+  	 *((float2*)(&Ocon))=gOcon;
+     
+	/*
       using a while-loop to terminate a thread by np will cause MT RNG to be 3.5x slower
       LL5 RNG will only be slightly slower than for-loop with photon-move criterion
 
@@ -209,8 +274,10 @@ kernel void mcx_main_loop(int nphoton,int ophoton,uchar media[],float field[],
       and we do not use MT as the default RNG.
      */
 
+//MTA. This is the main loop that executes the photon propagation through the medium.
      while(f.ndone<(idx<ophoton?nphoton+1:nphoton)) {
-
+	
+	
           GPUDEBUG(("*i= (%d) L=%f w=%e a=%f\n",(int)f.ndone,f.pscat,p.w,f.t));
 
           // dealing with scattering
@@ -221,9 +288,9 @@ kernel void mcx_main_loop(int nphoton,int ophoton,uchar media[],float field[],
 
                GPUDEBUG(("next scat len=%20.16e \n",f.pscat));
 	       if(p.w<1.f){ // if this is not my first jump
-                       //random arimuthal angle
-                       tmp0=TWO_PI*rand_next_aangle(t); //next arimuth angle
-                       sincosf(tmp0,&sphi,&cphi);
+                       //random azimuthal angle
+                       tmp0=TWO_PI*rand_next_aangle(t); //next azimuth angle
+                       sincosf(tmp0,&sphi,&cphi);  //MTA sphi is sin of azimuthal angle, cphi is cosine
                        GPUDEBUG(("next angle phi %20.16e\n",tmp0));
 
                        //Henyey-Greenstein Phase Function, "Handbook of Optical 
@@ -232,60 +299,154 @@ kernel void mcx_main_loop(int nphoton,int ophoton,uchar media[],float field[],
                        if(prop.g>EPS){  //if prop.g is too small, the distribution of theta is bad
 		           tmp0=(1.f-prop.g*prop.g)/(1.f-prop.g+2.f*prop.g*rand_next_zangle(t));
 		           tmp0*=tmp0;
-		           tmp0=(1.f+prop.g*prop.g-tmp0)/(2.f*prop.g);
+		           tmp0=(1.f+prop.g*prop.g-tmp0)/(2.f*prop.g);	//MTA This is the cosine of the scattering angle
 
                            // when ran=1, CUDA gives me 1.000002 for tmp0 which produces nan later
                            // detected by Ocelot,thanks to Greg Diamos,see http://bit.ly/cR2NMP
                            tmp0=max(-1.f, min(1.f, tmp0));
 
-		           theta=acosf(tmp0);
-		           stheta=sinf(theta);
-		           ctheta=tmp0;
+				   theta=acosf(tmp0);	//MTA this is the scattering angle
+		           stheta=sinf(theta);	//MTA sine of the scattering angle
+		           ctheta=tmp0;			//MTA cosine of the scattering angle
                        }else{
-			   theta=TWO_PI*rand_next_zangle(t);
+                       //theta=acosf(2.f*rand_next_zangle(t,tnew)-1.f);
+			   			theta=TWO_PI*rand_next_zangle(t); //MTA Note: there is a bug in this when g=0. See newer MCX versions for fix
                            sincosf(theta,&stheta,&ctheta);
                        }
                        GPUDEBUG(("next scat angle theta %20.16e\n",theta));
-
+                       
+                       
 		       if( v.z>-1.f+EPS && v.z<1.f-EPS ) {
+		       		// See "Biomedical Optics: Principles and Imaging",2007,Chap3,p47
+		       		
 		           tmp0=1.f-v.z*v.z;   //reuse tmp to minimize registers
 		           tmp1=rsqrtf(tmp0);
 		           tmp1=stheta*tmp1;
-		           *((float4*)(&v))=float4(
-				tmp1*(v.x*v.z*cphi - v.y*sphi) + v.x*ctheta,
-				tmp1*(v.y*v.z*cphi + v.x*sphi) + v.y*ctheta,
-				-tmp1*tmp0*cphi                + v.z*ctheta,
-				v.nscat
-			   );
-                           GPUDEBUG(("new dir: %10.5e %10.5e %10.5e\n",v.x,v.y,v.z));
-		       }else{
-			   *((float4*)(&v))=float4(stheta*cphi,stheta*sphi,(v.z>0.f)?ctheta:-ctheta,v.nscat);
-                           GPUDEBUG(("new dir-z: %10.5e %10.5e %10.5e\n",v.x,v.y,v.z));
- 		       }
-                       v.nscat++;
+		           
+		           
+				//	MTA This is where phase modulations due to scatterer displacement are calculated
+				rPmag = rsqrtf(pressure.Px*pressure.Px + pressure.Py*pressure.Py + pressure.Pz*pressure.Pz);
+				Pmag = sqrtf(pressure.Px*pressure.Px + pressure.Py*pressure.Py + pressure.Pz*pressure.Pz); 
+				xdiff = v.x - (tmp1*(v.x*v.z*cphi - v.y*sphi) + v.x*ctheta);		
+				ydiff = v.y - (tmp1*(v.y*v.z*cphi + v.x*sphi) + v.y*ctheta);		
+				zdiff = v.z - (-tmp1*tmp0*cphi + v.z*ctheta);						
+				dot_a_o = pressure.Px*rPmag*xdiff + pressure.Py*rPmag*ydiff + pressure.Pz*rPmag*zdiff;		
+			
+				// MTA phase modulation terms			
+				cosj_inc = TWO_PI/(Ocon.lambda) * prop.n / (TWO_PI*Acon.f*(Acon.rho)*(Acon.va)) * dot_a_o * Pmag * sinf(pressure.USphase);
+				sinj_inc = TWO_PI/(Ocon.lambda) * prop.n; 
+				
+				
+				// MTA sum phase modulation terms						
+				if(pressure.Px>EPS || pressure.Py>EPS || pressure.Pz>EPS){											
+						*((float4*)(&ao_sums))=float4(
+											ao_sums.Pncosi,
+											ao_sums.Pnsini,
+											ao_sums.Pdcosj + cosj_inc,
+											ao_sums.Pdsinj + sinj_inc
+											);
+				 }					
+						// MTA New scattering direction				
+		        		*((float4*)(&v))=float4(
+											tmp1*(v.x*v.z*cphi - v.y*sphi) + v.x*ctheta,
+											tmp1*(v.y*v.z*cphi + v.x*sphi) + v.y*ctheta, 
+											-tmp1*tmp0*cphi + v.z*ctheta, 
+											v.nscat
+											);
+					
+		               GPUDEBUG(("new dir: %10.5e %10.5e %10.5e\n",v.x,v.y,v.z));
+				       }else{									// Note: This if/else statement has little to no impact on accumulated phase modulations!
+				       		xdiff = v.x - stheta*cphi;		
+							ydiff = v.y - stheta*sphi;		
+							zdiff = (v.z>0.f)?(v.z-ctheta):(v.z+ctheta);
+							rPmag = rsqrtf(pressure.Px*pressure.Px + pressure.Py*pressure.Py + pressure.Pz*pressure.Pz);
+							Pmag = sqrtf(pressure.Px*pressure.Px + pressure.Py*pressure.Py + pressure.Pz*pressure.Pz) + EPS;
+							dot_a_o = pressure.Px*rPmag*xdiff + pressure.Py*rPmag*ydiff + pressure.Pz*rPmag*zdiff;		
+							
+
+							cosj_inc = TWO_PI/(Ocon.lambda) * prop.n / (TWO_PI*Acon.f*(Acon.rho)*(Acon.va)) * dot_a_o * Pmag * sinf(pressure.USphase);
+							sinj_inc = TWO_PI/(Ocon.lambda) * prop.n / (TWO_PI*Acon.f*(Acon.rho)*(Acon.va)) * dot_a_o * Pmag * cosf(pressure.USphase);
+
+						
+				if(pressure.Px>EPS || pressure.Py>EPS || pressure.Pz>EPS){		
+						*((float4*)(&ao_sums))=float4(
+											ao_sums.Pncosi,
+											ao_sums.Pnsini,
+											ao_sums.Pdcosj + cosj_inc,
+											ao_sums.Pdsinj + sinj_inc
+											);	
+					}						
+							
+					   *((float4*)(&v))=float4(stheta*cphi,stheta*sphi,(v.z>0.f)?ctheta:-ctheta,v.nscat);
+		                           GPUDEBUG(("new dir-z: %10.5e %10.5e %10.5e\n",v.x,v.y,v.z));
+		 		       }
+		                       v.nscat++;
+					   
+					   //accum_press+=sqrtf(pressure.Px*pressure.Px + pressure.Py*pressure.Py + pressure.Pz*pressure.Pz);  //MTA Added 6/18/12, changed 6/20/12
+				
 	       }
 	  }
 
           n1=prop.n;
 	  *((float4*)(&prop))=gproperty[mediaid];
+	  // MTA Added all below
+  	  if(mediaid!=0){
+     	*((float4*)(&pressure))=gmedia_acous[idx1d]; 
+     }else{*((float4*)(&pressure))=float4(0.f,0.f,0.f,0.f);}
 	  len=gcfg->minstep*prop.mus; //unitless (minstep=grid, mus=1/grid)
+	  Pmag = sqrtf(pressure.Px*pressure.Px + pressure.Py*pressure.Py + pressure.Pz*pressure.Pz);
 
           // dealing with absorption
 
           p0=p;
 	  if(len>f.pscat){  //scattering ends in this voxel: mus*gcfg->minstep > s 
-               tmp0=f.pscat/prop.mus; // unit=grid
+               tmp0=f.pscat/prop.mus; // unit=grid			//MTA this is the pathlength.
+		//MTA. This is where position and packet weight are updated 
    	       *((float4*)(&p))=float4(p.x+v.x*tmp0,p.y+v.y*tmp0,p.z+v.z*tmp0,
                            p.w*expf(-prop.mua*tmp0)); //mua=1/grid, tmp0=grid
+                                                     
+
+				//MTA REFRACTIVE INDEX MODULATION ACCUMULATIONS HERE
+
+				cosi_inc = gcfg->gridunit/1000.f*TWO_PI/(Ocon.lambda) * prop.n * tmp0 * Ocon.nu / ((Acon.rho)*(Acon.va)*(Acon.va)) * Pmag * cosf(pressure.USphase);
+				sini_inc = -1.f*gcfg->gridunit/1000.f*TWO_PI/(Ocon.lambda) * prop.n * tmp0 * Ocon.nu / ((Acon.rho)*(Acon.va)*(Acon.va)) * Pmag * sinf(pressure.USphase);
+					
+				if(pressure.Px>EPS || pressure.Py>EPS || pressure.Pz>EPS){
+				*((float4*)(&ao_sums))=float4(
+					ao_sums.Pncosi + cosi_inc,		
+					ao_sums.Pnsini + sini_inc,		
+					ao_sums.Pdcosj,	
+					ao_sums.Pdsinj		
+		   			);		//MTA added 6/29/12, changed 7/2/12
+		   			}
+
+			
 	       f.pscat=SAME_VOXEL;
 	       f.t+=tmp0*prop.n*gcfg->oneoverc0;  //propagation time (unit=s)
-               if(gcfg->savedet) ppath[mediaid-1]+=tmp0; //(unit=grid)
+		//MTA.  This is where partial pathlength is accumulated
+			if(gcfg->savedet) ppath[mediaid-1]+=tmp0; //(unit=grid)
+			
                GPUDEBUG((">>ends in voxel %f<%f %f [%d]\n",f.pscat,len,prop.mus,idx1d));
 	  }else{                      //otherwise, move gcfg->minstep
                if(mediaid!=medid)
-                  atten=expf(-prop.mua*gcfg->minstep);
+					atten=expf(-prop.mua*gcfg->minstep);
 
+   	       // Update position and weight
    	       *((float4*)(&p))=float4(p.x+v.x,p.y+v.y,p.z+v.z,p.w*atten);
+   	 
+				// MTA calculate and add phase modulations
+				cosi_inc = gcfg->gridunit/1000.f*TWO_PI/(Ocon.lambda) * prop.n * gcfg->minstep * Ocon.nu / ((Acon.rho)*(Acon.va)*(Acon.va)) * Pmag * cosf(pressure.USphase);
+				sini_inc = -1.f*gcfg->gridunit/1000.f*TWO_PI/(Ocon.lambda) * prop.n * gcfg->minstep * Ocon.nu / ((Acon.rho)*(Acon.va)*(Acon.va)) * Pmag * sinf(pressure.USphase);
+				
+			if(pressure.Px>EPS || pressure.Py>EPS || pressure.Pz>EPS){
+				*((float4*)(&ao_sums))=float4(
+					ao_sums.Pncosi + cosi_inc,		
+					ao_sums.Pnsini + sini_inc,	
+					ao_sums.Pdcosj,		
+					ao_sums.Pdsinj	
+	   				);  //MTA Added 6/29/12, changed 7/2/12
+	   				}
+	
                medid=mediaid;
 	       f.pscat-=len;     //remaining probability: sum(s_i*mus_i), unit-less
 	       f.t+=gcfg->minaccumtime*prop.n; //propagation time  (unit=s)
@@ -293,6 +454,43 @@ kernel void mcx_main_loop(int nphoton,int ophoton,uchar media[],float field[],
                GPUDEBUG((">>keep going %f<%f %f [%d] %e %e\n",f.pscat,len,prop.mus,idx1d,f.t,f.tnext));
 	  }
 
+		 //Find magnitude and phase of modulations 
+//if(f.pscat<=0.f){		 
+		if((ao_sums.Pncosi+ao_sums.Pdcosj)>0.f){		
+			*((float2*)(&mod))=float2(
+				sqrtf((ao_sums.Pncosi+ao_sums.Pdcosj)*(ao_sums.Pncosi+ao_sums.Pdcosj)+(-ao_sums.Pnsini-ao_sums.Pdsinj)*(-ao_sums.Pnsini-ao_sums.Pdsinj)), 
+				atanf((-ao_sums.Pdsinj - ao_sums.Pnsini) / (ao_sums.Pdcosj + ao_sums.Pncosi))		
+			);
+		}else if((ao_sums.Pncosi+ao_sums.Pdcosj)<0.f && (-ao_sums.Pnsini-ao_sums.Pdsinj)>=0.f){
+			*((float2*)(&mod))=float2(
+				sqrtf((ao_sums.Pncosi+ao_sums.Pdcosj)*(ao_sums.Pncosi+ao_sums.Pdcosj)+(-ao_sums.Pnsini-ao_sums.Pdsinj)*(-ao_sums.Pnsini-ao_sums.Pdsinj)), 
+				atanf((-ao_sums.Pdsinj - ao_sums.Pnsini) / (ao_sums.Pdcosj + ao_sums.Pncosi)) + ONE_PI		
+			);
+		}else if((ao_sums.Pncosi+ao_sums.Pdcosj)<0.f && (-ao_sums.Pnsini-ao_sums.Pdsinj)<0.f){
+			*((float2*)(&mod))=float2(
+				sqrtf((ao_sums.Pncosi+ao_sums.Pdcosj)*(ao_sums.Pncosi+ao_sums.Pdcosj)+(-ao_sums.Pnsini-ao_sums.Pdsinj)*(-ao_sums.Pnsini-ao_sums.Pdsinj)), 
+				atanf((-ao_sums.Pdsinj - ao_sums.Pnsini) / (ao_sums.Pdcosj + ao_sums.Pncosi)) - ONE_PI		
+			);
+		}else if((ao_sums.Pncosi+ao_sums.Pdcosj)==0.f && (-ao_sums.Pnsini-ao_sums.Pdsinj)>0.f){
+			*((float2*)(&mod))=float2(
+				sqrtf((ao_sums.Pncosi+ao_sums.Pdcosj)*(ao_sums.Pncosi+ao_sums.Pdcosj)+(-ao_sums.Pnsini-ao_sums.Pdsinj)*(-ao_sums.Pnsini-ao_sums.Pdsinj)), 
+				ONE_PI/2.f		
+			);
+		}else if((ao_sums.Pncosi+ao_sums.Pdcosj)==0.f && (-ao_sums.Pnsini-ao_sums.Pdsinj)<0.f){
+			*((float2*)(&mod))=float2(
+				sqrtf((ao_sums.Pncosi+ao_sums.Pdcosj)*(ao_sums.Pncosi+ao_sums.Pdcosj)+(-ao_sums.Pnsini-ao_sums.Pdsinj)*(-ao_sums.Pnsini-ao_sums.Pdsinj)), 
+				-ONE_PI/2.f		
+			);
+		}else{						
+			*((float2*)(&mod))=float2(
+				0,
+				0
+			);
+		}	
+//}
+		
+		
+						
           mediaidold=media[idx1d];
           idx1dold=idx1d;
           idx1d=(int(floorf(p.z))*gcfg->dimlen.y+int(floorf(p.y))*gcfg->dimlen.x+int(floorf(p.x)));
@@ -304,6 +502,8 @@ kernel void mcx_main_loop(int nphoton,int ophoton,uchar media[],float field[],
           }
 
           // dealing with boundaries
+
+		
 
           //if it hits the boundary, exceeds the max time window or exits the domain, rebound or launch a new one
 	  if(mediaid==0||f.t>gcfg->tmax||f.t>gcfg->twin1||(gcfg->dorefint && n1!=gproperty[mediaid].w) ){
@@ -380,7 +580,11 @@ kernel void mcx_main_loop(int nphoton,int ophoton,uchar media[],float field[],
                 }
               }
 
+			 
               *((float4*)(&prop))=gproperty[mediaid]; // optical property across the interface
+              if(mediaid!=0){
+     				*((float4*)(&pressure))=gmedia_acous[idx1d]; 
+     		  }else{*((float4*)(&pressure))=float4(0.f,0.f,0.f,0.f);}
 
               GPUDEBUG(("->ID%d J%d C%d tlen %e flip %d %.1f!=%.1f dir=%f %f %f pos=%f %f %f\n",idx,(int)v.nscat,
                   (int)f.ndone,f.t, (int)flipdir, n1,prop.n,v.x,v.y,v.z,p.x,p.y,p.z));
@@ -420,8 +624,8 @@ kernel void mcx_main_loop(int nphoton,int ophoton,uchar media[],float field[],
 	          if(Rtotal<1.f && rand_next_reflect(t)>Rtotal){ // do transmission
                         if(mediaid==0){ // transmission to external boundary
                             p.x=htime.x;p.y=htime.y;p.z=htime.z;p.w=p0.w;
-		    	    launchnewphoton(&p,&v,&f,&prop,&idx1d,&mediaid,(mediaidold & DET_MASK),
-			        ppath,&energyloss,n_det,detectedphoton);
+		    	    launchnewphoton(&p,&v,&f,&ao_sums,&mod,&prop,&pressure,&Acon,&Ocon,&idx1d,&mediaid,(mediaidold & DET_MASK),  //MTA changed 6/18/12, 6/20/12, 6/29/12, 7/2/12
+			        ppath,&energyloss,n_det,detectedphoton);  //MTA changed 6/18/12
 			    continue;
 			}
 			tmp0=n1/prop.n;
@@ -450,12 +654,16 @@ kernel void mcx_main_loop(int nphoton,int ophoton,uchar media[],float field[],
                         p=p0;   //move to the reflection point
                 	idx1d=idx1dold;
 		 	mediaid=(media[idx1d] & MED_MASK);
+	
         	  	*((float4*)(&prop))=gproperty[mediaid];
-                  	n1=prop.n;
+				if(mediaid!=0){
+     				*((float4*)(&pressure))=gmedia_acous[idx1d]; 
+     			}else{*((float4*)(&pressure))=float4(0.f,0.f,0.f,0.f);}
+                  n1=prop.n;
 		  }
               }else{  // launch a new photon
                   p.x=htime.x;p.y=htime.y;p.z=htime.z;p.w=p0.w;
-		  launchnewphoton(&p,&v,&f,&prop,&idx1d,&mediaid,(mediaidold & DET_MASK),ppath,
+		  launchnewphoton(&p,&v,&f,&ao_sums,&mod,&prop,&pressure,&Acon,&Ocon,&idx1d,&mediaid,(mediaidold & DET_MASK),ppath,  //MTA changed 6/18/12, 6/20/12, 6/29/12
 		      &energyloss,n_det,detectedphoton);
 		  continue;
               }
@@ -471,7 +679,7 @@ kernel void mcx_main_loop(int nphoton,int ophoton,uchar media[],float field[],
 #ifdef TEST_RACING
                   // enable TEST_RACING to determine how many missing accumulations due to race
                   if( (p.x-gcfg->ps.x)*(p.x-gcfg->ps.x)+(p.y-gcfg->ps.y)*(p.y-gcfg->ps.y)+(p.z-gcfg->ps.z)*(p.z-gcfg->ps.z)>gcfg->skipradius2) {
-                      field[idx1d+(int)(floorf((f.t-gcfg->twin0)*gcfg->Rtstep))*gcfg->dimlen.z]+=1.f;
+                      field0[idx1d+(int)(floorf((f.t-gcfg->twin0)*gcfg->Rtstep))*gcfg->dimlen.z]+=1.f;
 		      cc++;
                   }
 #else
@@ -489,14 +697,17 @@ kernel void mcx_main_loop(int nphoton,int ophoton,uchar media[],float field[],
                           accumweight+=p.w*prop.mua; // weight*absorption
   #endif
                       }else{
-                          field[idx1d+(int)(floorf((f.t-gcfg->twin0)*gcfg->Rtstep))*gcfg->dimlen.z]+=p.w;
+                          field0[idx1d+(int)(floorf((f.t-gcfg->twin0)*gcfg->Rtstep))*gcfg->dimlen.z]+=p.w*j0f(mod.magnitude)*j0f(mod.magnitude);
+                          field1[idx1d+(int)(floorf((f.t-gcfg->twin0)*gcfg->Rtstep))*gcfg->dimlen.z]+=p.w*2.f*j1f(mod.magnitude)*j1f(mod.magnitude);
                       }
                   }else{
-                      field[idx1d+(int)(floorf((f.t-gcfg->twin0)*gcfg->Rtstep))*gcfg->dimlen.z]+=p.w;
+                      field0[idx1d+(int)(floorf((f.t-gcfg->twin0)*gcfg->Rtstep))*gcfg->dimlen.z]+=p.w*j0f(mod.magnitude)*j0f(mod.magnitude);
+                      field1[idx1d+(int)(floorf((f.t-gcfg->twin0)*gcfg->Rtstep))*gcfg->dimlen.z]+=p.w*2.f*j1f(mod.magnitude)*j1f(mod.magnitude);
                   }
   #else
                   // ifndef CUDA_NO_SM_11_ATOMIC_INTRINSICS
-		  atomicadd(& field[idx1d+(int)(floorf((f.t-gcfg->twin0)*gcfg->Rtstep))*gcfg->dimlen.z], p.w);
+		  atomicadd(& field0[idx1d+(int)(floorf((f.t-gcfg->twin0)*gcfg->Rtstep))*gcfg->dimlen.z], p.w*j0f(mod.magnitude)*j0f(mod.magnitude));
+		  atomicadd(& field1[idx1d+(int)(floorf((f.t-gcfg->twin0)*gcfg->Rtstep))*gcfg->dimlen.z], p.w*2.f*j1f(mod.magnitude)*j1f(mod.magnitude));
   #endif
 #endif
 	     }
@@ -510,7 +721,7 @@ kernel void mcx_main_loop(int nphoton,int ophoton,uchar media[],float field[],
 #ifdef  USE_CACHEBOX
      if(gcfg->skipradius2>EPS){
      	f.tnext=0.f;
-        savecache(field,cachebox);
+        savecache(field0,cachebox);
      }
 #else
      f.tnext=accumweight;
@@ -525,9 +736,12 @@ kernel void mcx_main_loop(int nphoton,int ophoton,uchar media[],float field[],
      n_pos[idx]=*((float4*)(&p));
      n_dir[idx]=*((float4*)(&v));
      n_len[idx]=*((float4*)(&f));
+	 n_AO_sums[idx]=*((float4*)(&ao_sums));		//MTA added 6/29/12
+	 n_mod[idx]=*((float2*)(&mod));		//MTA added 6/29/12, removed 1/28/13
 }
 
-kernel void mcx_sum_trueabsorption(float energy[],uchar media[], float field[], int maxgate,uint3 dimlen){
+// I'm not sure what's going on here. //////////////////////////////////////////////////////////////////////////////////////////////////////////////
+kernel void mcx_sum_trueabsorption(float energy[],uchar media[], float field[], int maxgate,uint3 dimlen){		//MTA changed 6/26/12
      int i;
      float phi=0.f;
      int idx= blockIdx.x*dimlen.y+blockIdx.y*dimlen.x+ threadIdx.x;
@@ -578,7 +792,8 @@ int mcx_set_gpu(Config *cfg){
 		if(cfg->autopilot==1){
 			cfg->nblocksize=64;
 			cfg->nthread=256*dp.multiProcessorCount*dp.multiProcessorCount;
-			needmem+=cfg->nthread*sizeof(float4)*4+sizeof(float)*cfg->maxdetphoton*(cfg->medianum+1)+10*1024*1024; /*keep 10M for other things*/
+			needmem+=cfg->nthread*sizeof(float4)*5+cfg->nthread*sizeof(float2)+sizeof(float)*cfg->maxdetphoton*(cfg->medianum+3)+10*1024*1024; /*keep 10M for other things*/ //MTA changed 6/20/12
+			needmem+=cfg->dim.x*cfg->dim.y*cfg->dim.z*sizeof(float4);
 			cfg->maxgate=((unsigned int)dp.totalGlobalMem-needmem)/(cfg->dim.x*cfg->dim.y*cfg->dim.z);
 			cfg->maxgate=MIN((int)((cfg->tend-cfg->tstart)/cfg->tstep+0.5),cfg->maxgate);
 			fprintf(cfg->flog,"autopilot mode: setting thread number to %d, block size to %d and time gates to %d\n",cfg->nthread,cfg->nblocksize,cfg->maxgate);
@@ -604,7 +819,7 @@ Shared Memory:\t\t%u B\nRegisters:\t\t%u\nClock Speed:\t\t%.2f GHz\n",
 	  }
 	}
     }
-    if(cfg->isgpuinfo==2 && cfg->exportfield==NULL){ //list GPU info only
+    if(cfg->isgpuinfo==2 && cfg->exportfield0==NULL){ //list GPU info only
           exit(0);
     }
     if (cfg->gpuid==0)
@@ -620,6 +835,8 @@ Shared Memory:\t\t%u B\nRegisters:\t\t%u\nClock Speed:\t\t%.2f GHz\n",
 /**
    host code for MCX kernels
 */
+
+//MTA. This is the CPU code that executes the GPU MC kernels
 void mcx_run_simulation(Config *cfg){
 
      int i,iter;
@@ -644,18 +861,22 @@ void mcx_run_simulation(Config *cfg){
      
      int dimxyz=cfg->dim.x*cfg->dim.y*cfg->dim.z;
      
-     uchar  *media=(uchar *)(cfg->vol);
-     float  *field;
-     MCXParam param={cfg->steps,minstep,0,0,cfg->tend,R_C0*cfg->unitinmm,cfg->isrowmajor,
+     uchar  	*media=(uchar *)(cfg->vol);		//MTA changed 6/26/12
+     float  	*field0;			//MTA unmodulated fluence
+     float  	*field1;			//MTA modulated fluence
+	 //MTA.  I'll probably want to add an option in the MCXParam here to ask if you want to do an AO simulation or just an optical simulation. //////////////////////
+     MCXParam param={cfg->unitinmm,cfg->steps,minstep,0,0,cfg->tend,R_C0*cfg->unitinmm,cfg->isrowmajor,
                      cfg->issave2pt,cfg->isreflect,cfg->isrefint,cfg->issavedet,1.f/cfg->tstep,
 		     p0,c0,maxidx,uint3(0,0,0),cp0,cp1,uint2(0,0),cfg->minenergy,
                      cfg->sradius*cfg->sradius,minstep*R_C0*cfg->unitinmm,cfg->maxdetphoton,
 		     cfg->medianum-1,cfg->detnum,0,0};
 
      if(cfg->respin>1){
-         field=(float *)calloc(sizeof(float)*dimxyz,cfg->maxgate*2);
+         field0=(float *)calloc(sizeof(float)*dimxyz,cfg->maxgate*2);	//MTA
+         field1=(float *)calloc(sizeof(float)*dimxyz,cfg->maxgate*2);	//MTA
      }else{
-         field=(float *)calloc(sizeof(float)*dimxyz,cfg->maxgate); //the second half will be used to accumulate
+         field0=(float *)calloc(sizeof(float)*dimxyz,cfg->maxgate);		//MTA
+         field1=(float *)calloc(sizeof(float)*dimxyz,cfg->maxgate);		//MTA
      }
 
      float4 *Ppos;
@@ -664,6 +885,9 @@ void mcx_run_simulation(Config *cfg){
      uint   *Pseed;
      float  *Pdet;
      uint    detected=0,sharedbuf=0;
+	 float4 *Pao_sums;		// MTA
+	 float2 *Pmod;			//MTA
+
 
      if(cfg->nthread%cfg->nblocksize)
      	cfg->nthread=(cfg->nthread/cfg->nblocksize)*cfg->nblocksize;
@@ -681,33 +905,80 @@ void mcx_run_simulation(Config *cfg){
      Pdir=(float4*)malloc(sizeof(float4)*cfg->nthread);
      Plen=(float4*)malloc(sizeof(float4)*cfg->nthread);
      Plen0=(float4*)malloc(sizeof(float4)*cfg->nthread);
+	 Pao_sums=(float4*)malloc(sizeof(float4)*cfg->nthread);		//MTA
+	 Pmod=(float2*)malloc(sizeof(float2)*cfg->nthread);		//MTA
      Pseed=(uint*)malloc(sizeof(uint)*cfg->nthread*RAND_SEED_LEN);
      energy=(float*)calloc(cfg->nthread*2,sizeof(float));
-     Pdet=(float*)calloc(cfg->maxdetphoton,sizeof(float)*(cfg->medianum+1));
+     Pdet=(float*)calloc(cfg->maxdetphoton,sizeof(float)*(cfg->medianum+3));  //MTA Changed medianum+1 to medianum+3
 
-     uchar *gmedia;
-     mcx_cu_assess(cudaMalloc((void **) &gmedia, sizeof(uchar)*(dimxyz)),__FILE__,__LINE__);
-     float *gfield;
-     mcx_cu_assess(cudaMalloc((void **) &gfield, sizeof(float)*(dimxyz)*cfg->maxgate),__FILE__,__LINE__);
+
+     uchar *gmedia;	//MTA changed 6/26/12
+     mcx_cu_assess(cudaMalloc((void **) &gmedia, sizeof(uchar)*(dimxyz)),__FILE__,__LINE__);		//MTA Changed 6/26/12. changed sizeof(uchar) to sizeof(ushort)
+     /*Acoustics *gmedia_acous;	//MTA changed 6/26/12
+     mcx_cu_assess(cudaMalloc((void **) &gmedia_acous, sizeof(Acoustics)*(dimxyz)),__FILE__,__LINE__);*/
+     float *gfield0;
+     mcx_cu_assess(cudaMalloc((void **) &gfield0, sizeof(float)*(dimxyz)*cfg->maxgate),__FILE__,__LINE__);
+     float *gfield1;
+     mcx_cu_assess(cudaMalloc((void **) &gfield1, sizeof(float)*(dimxyz)*cfg->maxgate),__FILE__,__LINE__);     
 
      //cudaBindTexture(0, texmedia, gmedia);
-
+	
      float4 *gPpos;
      mcx_cu_assess(cudaMalloc((void **) &gPpos, sizeof(float4)*cfg->nthread),__FILE__,__LINE__);
      float4 *gPdir;
      mcx_cu_assess(cudaMalloc((void **) &gPdir, sizeof(float4)*cfg->nthread),__FILE__,__LINE__);
      float4 *gPlen;
      mcx_cu_assess(cudaMalloc((void **) &gPlen, sizeof(float4)*cfg->nthread),__FILE__,__LINE__);
+	 float4 *gPao_sums;
+	 mcx_cu_assess(cudaMalloc((void **) &gPao_sums, sizeof(float4)*cfg->nthread),__FILE__,__LINE__);
+	 float2 *gPmod;
+	 mcx_cu_assess(cudaMalloc((void **) &gPmod, sizeof(float2)*cfg->nthread),__FILE__,__LINE__);
      uint   *gPseed;
      mcx_cu_assess(cudaMalloc((void **) &gPseed, sizeof(uint)*cfg->nthread*RAND_SEED_LEN),__FILE__,__LINE__);
      float  *gPdet;
-     mcx_cu_assess(cudaMalloc((void **) &gPdet, sizeof(float)*cfg->maxdetphoton*(cfg->medianum+1)),__FILE__,__LINE__);
+     mcx_cu_assess(cudaMalloc((void **) &gPdet, sizeof(float)*cfg->maxdetphoton*(cfg->medianum+3)),__FILE__,__LINE__);  //MTA Changed 6/18/12.  Changed medianum+1 to medianum+3.
      uint   *gdetected;
      mcx_cu_assess(cudaMalloc((void **) &gdetected, sizeof(uint)),__FILE__,__LINE__);
 
      float *genergy;
      cudaMalloc((void **) &genergy, sizeof(float)*cfg->nthread*2);
+
+     // MTA If you are worried about memory allocation, this was written a while ago to show the sizes of your variables
      
+	/* displaying memory allocations */
+	/*printf("========================   GPU Memory Allocation  ===========================\n");
+	printf("Size of data types used: \n");
+	printf("sizeof(float4): %d bytes \n", sizeof(float4));
+	printf("sizeof(uint): %d bytes \n", sizeof(uint));
+	printf("sizeof(float): %d bytes \n", sizeof(float));
+	printf("sizeof(uchar): %d bytes \n", sizeof(uchar));
+	printf("sizeof(ushort): %d bytes \n", sizeof(ushort));	//MTA added 6/26/12
+	
+	printf("\nvalues of important GPU variables: \n");
+	printf("dimxyz: %d  \n", dimxyz);
+	printf("maxgate: %d  \n", cfg->maxgate);
+	printf("nthread: %d  \n", cfg->nthread);
+	printf("RAND_SEED_LEN: %d  \n", RAND_SEED_LEN);
+	printf("maxdetphoton: %d  \n", cfg->maxdetphoton);
+	printf("medianum: %d  \n", cfg->medianum);
+	
+	printf("\nSize of GPU variables: \n");
+	printf("gmedia: %d bytes \n",sizeof(uchar)*(dimxyz));
+	printf("gmedia_acous: %d bytes \n",sizeof(Acoustics)*(dimxyz));
+	printf("gfield0: %d bytes \n",sizeof(float)*(dimxyz)*cfg->maxgate);	
+	printf("gfield1: %d bytes \n",sizeof(float)*(dimxyz)*cfg->maxgate);	
+	printf("gPpos: %d bytes \n",sizeof(float4)*cfg->nthread);
+	printf("gPdir: %d bytes \n",sizeof(float4)*cfg->nthread);
+	printf("gPlen: %d bytes \n",sizeof(float4)*cfg->nthread);
+	printf("gPao_sums: %d bytes \n",sizeof(float4)*cfg->nthread);		//MTA added 6/20/12
+	printf("gPmod: %d bytes \n",sizeof(float2)*cfg->nthread);		//MTA added 6/29/12
+	printf("gPseed: %d bytes \n",sizeof(uint)*cfg->nthread*RAND_SEED_LEN);
+	printf("gPdet: %d bytes \n",sizeof(float)*cfg->maxdetphoton*(cfg->medianum+3));  //MTA Changed 6/18/12.  Changed medianum+1 to medianum+2.
+	printf("gdetected: %d bytes \n",sizeof(uint));
+	printf("genergy: %d bytes \n",sizeof(float)*cfg->nthread*2);	
+
+	printf("======================  End GPU Memory Allocation  =========================\n");
+*/
      /*volume is assumbed to be col-major*/
      cachebox.x=(cp1.x-cp0.x+1);
      cachebox.y=(cp1.y-cp0.y+1)*(cp1.x-cp0.x+1);
@@ -731,16 +1002,22 @@ void mcx_run_simulation(Config *cfg){
 	   Ppos[i]=p0;  // initial position
            Pdir[i]=c0;
            Plen[i]=float4(0.f,0.f,param.minaccumtime,0.f);
+		   Pao_sums[i]=float4(0.f,0.f,0.f,0.f);		//MTA
+		   Pmod[i]=float2(0.f,0.f);		//MTA
      }
+
 
      fprintf(cfg->flog,"\
 ###############################################################################\n\
-#                      Monte Carlo eXtreme (MCX) -- CUDA                      #\n\
-#     Copyright (c) 2009-2012 Qianqian Fang <fangq at nmr.mgh.harvard.edu>    #\n\
-#                                                                             #\n\
+#               Acousto-Optic Monte Carlo eXtreme (AO-MCX) -- CUDA            #\n\
+#   Orig. Copyright (c) 2009-2012 Qianqian Fang <fangq@nmr.mgh.harvard.edu>   #\n\
 #    Martinos Center for Biomedical Imaging, Massachusetts General Hospital   #\n\
+#																			  #\n\
+#				  AO-MCX Created by Matt Adams <adamsm2@bu.edu>       		  #\n\
+#								Boston University							  #\n\
+#									   2013									  #\n\
 ###############################################################################\n\
-$MCX $Rev:: 268 $ Last Commit $Date:: 2012-01-10 18:45:43#$ by $Author:: fangq$\n\
+$MCX-AOI $Rev:: 2 $ Last Commit $Date:: 2014-03-21 $ by $Author:: adamsm2$\n\
 ###############################################################################\n");
 
      tic=StartTimer();
@@ -763,10 +1040,13 @@ $MCX $Rev:: 268 $ Last Commit $Date:: 2012-01-10 18:45:43#$ by $Author:: fangq$\
      fflush(cfg->flog);
      fieldlen=dimxyz*cfg->maxgate;
 
-     cudaMemcpy(gmedia, media, sizeof(uchar) *dimxyz, cudaMemcpyHostToDevice);
-     cudaMemcpy(genergy,energy,sizeof(float) *cfg->nthread*2, cudaMemcpyHostToDevice);
 
+     cudaMemcpy(gmedia, media, sizeof(uchar) *dimxyz, cudaMemcpyHostToDevice);		//MTA changed sizeof(uchar) to sizeof(ushort) 6/26/12
+     cudaMemcpy(genergy,energy,sizeof(float) *cfg->nthread*2, cudaMemcpyHostToDevice);
+	 cudaMemcpyToSymbol(gAcon, cfg->Acon, sizeof(Aconstants), 0, cudaMemcpyHostToDevice);	//MTA
+	 cudaMemcpyToSymbol(gOcon, cfg->Ocon, sizeof(Oconstants), 0, cudaMemcpyHostToDevice); //MTA
      cudaMemcpyToSymbol(gproperty, cfg->prop,  cfg->medianum*sizeof(Medium), 0, cudaMemcpyHostToDevice);
+	 cudaMemcpyToSymbol(gmedia_acous, cfg->pressure, sizeof(float4)*dimxyz, 0, cudaMemcpyHostToDevice);  //MTA
      cudaMemcpyToSymbol(gdetpos, cfg->detpos,  cfg->detnum*sizeof(float4), 0, cudaMemcpyHostToDevice);
 
      fprintf(cfg->flog,"init complete : %d ms\n",GetTimeMillis()-tic);
@@ -787,6 +1067,8 @@ $MCX $Rev:: 268 $ Last Commit $Date:: 2012-01-10 18:45:43#$ by $Author:: fangq$\
      if(cfg->sradius>EPS || cfg->sradius<0.f)
         sharedbuf+=sizeof(float)*((cp1.x-cp0.x+1)*(cp1.y-cp0.y+1)*(cp1.z-cp0.z+1));
 #endif
+
+
      if(cfg->issavedet)
         sharedbuf+=cfg->nblocksize*sizeof(float)*(cfg->medianum-1);
 
@@ -797,6 +1079,7 @@ $MCX $Rev:: 268 $ Last Commit $Date:: 2012-01-10 18:45:43#$ by $Author:: fangq$\
 
        param.twin0=t;
        param.twin1=t+cfg->tstep*cfg->maxgate;
+
        cudaMemcpyToSymbol(gcfg,   &param,     sizeof(MCXParam), 0, cudaMemcpyHostToDevice);
 
        fprintf(cfg->flog,"lauching MCX simulation for time window [%.2ens %.2ens] ...\n"
@@ -804,39 +1087,46 @@ $MCX $Rev:: 268 $ Last Commit $Date:: 2012-01-10 18:45:43#$ by $Author:: fangq$\
 
        //total number of repetition for the simulations, results will be accumulated to field
        for(iter=0;iter<cfg->respin;iter++){
-           cudaMemset(gfield,0,sizeof(float)*fieldlen); // cost about 1 ms
-           cudaMemset(gPdet,0,sizeof(float)*cfg->maxdetphoton*(cfg->medianum+1));
+           cudaMemset(gfield0,0,sizeof(float)*fieldlen); // cost about 1 ms		//MTA
+           cudaMemset(gfield1,0,sizeof(float)*fieldlen); // cost about 1 ms		//MTA
+           cudaMemset(gPdet,0,sizeof(float)*cfg->maxdetphoton*(cfg->medianum+3));  //MTA medianum+1 to medianum+3.
            cudaMemset(gdetected,0,sizeof(float));
 
  	   cudaMemcpy(gPpos,  Ppos,  sizeof(float4)*cfg->nthread,  cudaMemcpyHostToDevice);
 	   cudaMemcpy(gPdir,  Pdir,  sizeof(float4)*cfg->nthread,  cudaMemcpyHostToDevice);
 	   cudaMemcpy(gPlen,  Plen,  sizeof(float4)*cfg->nthread,  cudaMemcpyHostToDevice);
+	   cudaMemcpy(gPao_sums,  Pao_sums,  sizeof(float4)*cfg->nthread,  cudaMemcpyHostToDevice);		//MTA
+	   cudaMemcpy(gPmod,  Pmod,  sizeof(float2)*cfg->nthread,  cudaMemcpyHostToDevice);		//MTA
            for (i=0; i<cfg->nthread*RAND_SEED_LEN; i++)
 		Pseed[i]=rand();
 	   cudaMemcpy(gPseed, Pseed, sizeof(uint)*cfg->nthread*RAND_SEED_LEN,  cudaMemcpyHostToDevice);
 
            tic0=GetTimeMillis();
            fprintf(cfg->flog,"simulation run#%2d ... \t",iter+1); fflush(cfg->flog);
-           mcx_main_loop<<<mcgrid,mcblock,sharedbuf>>>(threadphoton,oddphotons,gmedia,gfield,genergy,
-	                                               gPseed,gPpos,gPdir,gPlen,gPdet,gdetected);
+
+
+           mcx_main_loop<<<mcgrid,mcblock,sharedbuf>>>(threadphoton,oddphotons,gmedia,gmedia_acous,gfield0,gfield1,genergy,
+	                                               gPseed,gPpos,gPdir,gPlen,gPdet,gPao_sums,gPmod, gdetected);			//MTA
 
            cudaThreadSynchronize();
 	   cudaMemcpy(&detected, gdetected,sizeof(uint),cudaMemcpyDeviceToHost);
            tic1=GetTimeMillis();
 	   toc+=tic1-tic0;
            fprintf(cfg->flog,"kernel complete:  \t%d ms\nretrieving fields ... \t",tic1-tic);
-           mcx_cu_assess(cudaGetLastError(),__FILE__,__LINE__);
 
+
+           //mcx_cu_assess(cudaGetLastError(),__FILE__,__LINE__);
            cudaMemcpy(Plen0,  gPlen,  sizeof(float4)*cfg->nthread, cudaMemcpyDeviceToHost);
            cfg->his.totalphoton=0;
            for(i=0;i<cfg->nthread;i++)
 	      cfg->his.totalphoton+=int(Plen0[i].w+0.5f);
            photoncount+=cfg->his.totalphoton;
 
+//MTA.  This is where detector data is saved.
 #ifdef SAVE_DETECTORS
            if(cfg->issavedet){
-           	cudaMemcpy(Pdet, gPdet,sizeof(float)*cfg->maxdetphoton*(cfg->medianum+1),cudaMemcpyDeviceToHost);
-	        mcx_cu_assess(cudaGetLastError(),__FILE__,__LINE__);
+           	cudaMemcpy(Pdet, gPdet,sizeof(float)*cfg->maxdetphoton*(cfg->medianum+3),cudaMemcpyDeviceToHost);  //MTA
+	        //mcx_cu_assess(cudaGetLastError(),__FILE__,__LINE__);
 		if(detected>cfg->maxdetphoton){
 			fprintf(cfg->flog,"WARNING: the detected photon (%d) \
 is more than what your have specified (%d), please use the -H option to specify a greater number\t"
@@ -848,25 +1138,32 @@ is more than what your have specified (%d), please use the -H option to specify 
 		cfg->his.detected=detected;
 		cfg->his.savedphoton=MIN(detected,cfg->maxdetphoton);
 		if(cfg->exportdetected) //you must allocate the buffer long enough
-	                memcpy(cfg->exportdetected,Pdet,cfg->his.savedphoton*(cfg->medianum+1)*sizeof(float));
+	                memcpy(cfg->exportdetected,Pdet,cfg->his.savedphoton*(cfg->medianum+3)*sizeof(float));  //MTA
 		else
-			mcx_savedata(Pdet,cfg->his.savedphoton*(cfg->medianum+1),
-		             photoncount>cfg->his.totalphoton,"mch",cfg);
+			mcx_savedata(Pdet,cfg->his.savedphoton*(cfg->medianum+3),  //MTA
+		             photoncount>cfg->his.totalphoton,"mch",cfg,"none");
 	   }
 #endif
 
+
+//MTA. 2 pt distribution is another word for Green's function. Below is where fluence is normalized and saved.
+// I edited these to account for unmodulated (field0) and modulated (field1) fluences
 	   //handling the 2pt distributions
            if(cfg->issave2pt){
-               cudaMemcpy(field, gfield,sizeof(float) *dimxyz*cfg->maxgate,cudaMemcpyDeviceToHost);
+               cudaMemcpy(field0, gfield0,sizeof(float) *dimxyz*cfg->maxgate,cudaMemcpyDeviceToHost);
+               cudaMemcpy(field1, gfield1,sizeof(float) *dimxyz*cfg->maxgate,cudaMemcpyDeviceToHost);
                fprintf(cfg->flog,"transfer complete:\t%d ms\n",GetTimeMillis()-tic);  fflush(cfg->flog);
 
                if(cfg->respin>1){
                    for(i=0;i<fieldlen;i++)  //accumulate field, can be done in the GPU
-                      field[fieldlen+i]+=field[i];
+                      field0[fieldlen+i]+=field0[i];
+                      field1[fieldlen+i]+=field1[i];
                }
                if(iter+1==cfg->respin){
-                   if(cfg->respin>1)  //copy the accumulated fields back
-                       memcpy(field,field+fieldlen,sizeof(float)*fieldlen);
+                   if(cfg->respin>1){  //copy the accumulated fields back
+                       memcpy(field0,field0+fieldlen,sizeof(float)*fieldlen);
+                       memcpy(field1,field1+fieldlen,sizeof(float)*fieldlen);
+                       }
 
                    if(cfg->isnormalized){
                        //normalize field if it is the last iteration, temporarily do it in CPU
@@ -886,17 +1183,20 @@ is more than what your have specified (%d), please use the -H option to specify 
                        eabsorp+=energy[1];
                        scale=(cfg->nphoton-energy[0])/(cfg->nphoton*Vvox*cfg->tstep*eabsorp);
 		       if(cfg->unitinmm!=1.f) 
-		          scale/=(cfg->unitinmm*cfg->unitinmm); /* Vvox*(U*U*U) * (Tstep) * (Eabsorp/U) */
+		          scale/=(cfg->unitinmm*cfg->unitinmm); /* Vvox (already in mm^3) * (Tstep) * (Eabsorp/U) */
                        fprintf(cfg->flog,"normalization factor alpha=%f\n",scale);  fflush(cfg->flog);
-                       mcx_normalize(field,scale,fieldlen);
+                       mcx_normalize(field0,scale,fieldlen);
+                       mcx_normalize(field1,scale,fieldlen);
                    }
                    fprintf(cfg->flog,"data normalization complete : %d ms\n",GetTimeMillis()-tic);
 
-		   if(cfg->exportfield) //you must allocate the buffer long enough
-	                   memcpy(cfg->exportfield,field,fieldlen*sizeof(float));
-		   else{
+		   if(cfg->exportfield0){ //you must allocate the buffer long enough
+	                   memcpy(cfg->exportfield0,field0,fieldlen*sizeof(float));
+	                   memcpy(cfg->exportfield1,field1,fieldlen*sizeof(float));
+		   }else{
                            fprintf(cfg->flog,"saving data to file ...\t");
-	                   mcx_savedata(field,fieldlen,t>cfg->tstart,"mc2",cfg);
+	                   mcx_savedata(field0,fieldlen,t>cfg->tstart,"mc2",cfg,"0");
+	                   mcx_savedata(field1,fieldlen,t>cfg->tstart,"mc2",cfg,"1");
                            fprintf(cfg->flog,"saving data complete : %d ms\n\n",GetTimeMillis()-tic);
                            fflush(cfg->flog);
                    }
@@ -911,6 +1211,8 @@ is more than what your have specified (%d), please use the -H option to specify 
      cudaMemcpy(Ppos,  gPpos, sizeof(float4)*cfg->nthread, cudaMemcpyDeviceToHost);
      cudaMemcpy(Pdir,  gPdir, sizeof(float4)*cfg->nthread, cudaMemcpyDeviceToHost);
      cudaMemcpy(Plen,  gPlen, sizeof(float4)*cfg->nthread, cudaMemcpyDeviceToHost);
+  	 cudaMemcpy(Pao_sums,  gPao_sums, sizeof(float4)*cfg->nthread, cudaMemcpyDeviceToHost);		//MTA added 6/20/12
+	 cudaMemcpy(Pmod,  gPmod, sizeof(float2)*cfg->nthread, cudaMemcpyDeviceToHost);		//MTA added 6/29/12, removed 1/28/13
      cudaMemcpy(Pseed, gPseed,sizeof(uint)  *cfg->nthread*RAND_SEED_LEN,   cudaMemcpyDeviceToHost);
      cudaMemcpy(energy,genergy,sizeof(float)*cfg->nthread*2,cudaMemcpyDeviceToHost);
 
@@ -923,7 +1225,7 @@ is more than what your have specified (%d), please use the -H option to specify 
      {
        float totalcount=0.f,hitcount=0.f;
        for (i=0; i<fieldlen; i++)
-          hitcount+=field[i];
+          hitcount+=field0[i];
        for (i=0; i<cfg->nthread; i++)
 	  totalcount+=Pseed[i];
      
@@ -946,7 +1248,9 @@ is more than what your have specified (%d), please use the -H option to specify 
      fflush(cfg->flog);
 
      cudaFree(gmedia);
-     cudaFree(gfield);
+     cudaFree(gmedia_acous);	//MTA
+     cudaFree(gfield0);			//MTA
+     cudaFree(gfield1);			//MTA
      cudaFree(gPpos);
      cudaFree(gPdir);
      cudaFree(gPlen);
@@ -954,6 +1258,8 @@ is more than what your have specified (%d), please use the -H option to specify 
      cudaFree(genergy);
      cudaFree(gPdet);
      cudaFree(gdetected);
+ 	 cudaFree(gPao_sums);		//MTA
+ 	 cudaFree(gPmod);			//MTA
 
      cudaThreadExit();
 
@@ -964,5 +1270,9 @@ is more than what your have specified (%d), please use the -H option to specify 
      free(Pseed);
      free(Pdet);
      free(energy);
-     free(field);
+     free(field0);				//MTA
+     free(field1);				//MTA
+	 free(Pao_sums);			//MTA
+	 free(Pmod);				//MTA
 }
+

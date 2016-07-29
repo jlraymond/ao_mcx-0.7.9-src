@@ -1,5 +1,8 @@
 /*******************************************************************************
 **
+**  Acousto-Optic MCX (AO-MCX) - Matt Adams <adamsm2@bu.edu>
+**
+**	Written based on:
 **  Monte Carlo eXtreme - GPU accelerated Monte Carlo Photon Migration
 **  
 **  Author     : Qianqian Fang
@@ -18,6 +21,7 @@
 #include "tictoc.h"
 #include "mcx_utils.h"
 #include "mcx_core.h"
+//#include "math_functions.h"
 
 int main (int argc, char *argv[]) {
      Config mcxconfig;

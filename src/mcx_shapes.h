@@ -1,7 +1,8 @@
 #ifndef _MCEXTREME_RASTERIZER_H
 #define _MCEXTREME_RASTERIZER_H
 
-#include <vector_types.h>
+// Specific to the BU eng grid
+#include </ad/eng/support/software/linux/all/x86_64/cuda/cuda-4.0/include/vector_types.h>
 
 #ifdef  __cplusplus
 extern "C" {
