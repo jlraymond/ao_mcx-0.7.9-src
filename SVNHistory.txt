@@ -1,0 +1,2136 @@
+------------------------------------------------------------------------
+r272 | fangq | 2012-01-14 13:47:46 -0500 (Sat, 14 Jan 2012) | 1 line
+Changed paths:
+   M /mcextreme_cuda/trunk/src/mcx_utils.c
+
+backward compatible with older CUDA nvcc
+------------------------------------------------------------------------
+r271 | fangq | 2012-01-11 18:45:13 -0500 (Wed, 11 Jan 2012) | 1 line
+Changed paths:
+   M /mcextreme_cuda/trunk/ChangeLog.txt
+   M /mcextreme_cuda/trunk/doc/Download.txt
+   M /mcextreme_cuda/trunk/mcxlab/examples/demo_4layer_head.m
+   M /mcextreme_cuda/trunk/src/mcx_shapes.c
+   M /mcextreme_cuda/trunk/src/mcxlab.cpp
+
+fix a bug with -P option, fix a bug for mcxlab cfg.shapes
+------------------------------------------------------------------------
+r270 | fangq | 2012-01-11 14:22:43 -0500 (Wed, 11 Jan 2012) | 1 line
+Changed paths:
+   M /mcextreme_cuda/trunk/README.txt
+   M /mcextreme_cuda/trunk/TODO.txt
+   M /mcextreme_cuda/trunk/mcxlab/README.txt
+
+add help for using JSON input and shape files
+------------------------------------------------------------------------
+r269 | fangq | 2012-01-10 18:46:11 -0500 (Tue, 10 Jan 2012) | 1 line
+Changed paths:
+   M /mcextreme_cuda/trunk/mcxlab/README.txt
+   M /mcextreme_cuda/trunk/mcxlab/mcxlab.m
+   M /mcextreme_cuda/trunk/mcxlab/mcxlab_atom.m
+   M /mcextreme_cuda/trunk/src/Makefile
+   M /mcextreme_cuda/trunk/src/mcx_shapes.h
+   M /mcextreme_cuda/trunk/src/mcxlab.cpp
+
+support shapes in MCXLAB
+------------------------------------------------------------------------
+r268 | fangq | 2012-01-10 18:45:43 -0500 (Tue, 10 Jan 2012) | 1 line
+Changed paths:
+   M /mcextreme_cuda/trunk/src/mcx_core.cu
+
+experimental fix to boundary reflection accuracy issue in v0.5.2
+------------------------------------------------------------------------
+r267 | fangq | 2012-01-09 18:06:23 -0500 (Mon, 09 Jan 2012) | 1 line
+Changed paths:
+   M /mcextreme_cuda/trunk/README.txt
+   M /mcextreme_cuda/trunk/example/shapetest/jsonshape_allinone.json
+   M /mcextreme_cuda/trunk/example/shapetest/run_shapetest.sh
+   M /mcextreme_cuda/trunk/example/shapetest/shapes.json
+   M /mcextreme_cuda/trunk/src/mcx_shapes.c
+   M /mcextreme_cuda/trunk/src/mcx_shapes.h
+   M /mcextreme_cuda/trunk/src/mcx_utils.c
+   M /mcextreme_cuda/trunk/src/mcx_utils.h
+
+support -P command to add shapes at runtime, separate Layers from Slabs commands
+------------------------------------------------------------------------
+r266 | fangq | 2012-01-08 23:21:10 -0500 (Sun, 08 Jan 2012) | 1 line
+Changed paths:
+   M /mcextreme_cuda/trunk/ChangeLog.txt
+   M /mcextreme_cuda/trunk/TODO.txt
+   A /mcextreme_cuda/trunk/example/shapetest
+   A /mcextreme_cuda/trunk/example/shapetest/Makefile
+   A /mcextreme_cuda/trunk/example/shapetest/jsonshape.json
+   A /mcextreme_cuda/trunk/example/shapetest/jsonshape_allinone.json
+   A /mcextreme_cuda/trunk/example/shapetest/plotshapemask.m
+   A /mcextreme_cuda/trunk/example/shapetest/run_shapetest.sh
+   A /mcextreme_cuda/trunk/example/shapetest/shapes.json
+   M /mcextreme_cuda/trunk/src/Makefile
+   A /mcextreme_cuda/trunk/src/mcx_shapes.c
+   A /mcextreme_cuda/trunk/src/mcx_shapes.h
+   M /mcextreme_cuda/trunk/src/mcx_utils.c
+
+key feature: 3d shape definition and run-time rasterization
+------------------------------------------------------------------------
+r265 | fangq | 2012-01-07 10:41:35 -0500 (Sat, 07 Jan 2012) | 1 line
+Changed paths:
+   A /mcextreme_cuda/trunk/example/quicktest/qtest.json
+   A /mcextreme_cuda/trunk/src/cjson
+   A /mcextreme_cuda/trunk/src/cjson/README
+   A /mcextreme_cuda/trunk/src/cjson/cJSON.c
+   A /mcextreme_cuda/trunk/src/cjson/cJSON.h
+   A /mcextreme_cuda/trunk/src/cjson/test.c
+   M /mcextreme_cuda/trunk/src/mcx_core.cu
+   M /mcextreme_cuda/trunk/src/mcx_utils.c
+   M /mcextreme_cuda/trunk/src/mcx_utils.h
+
+fix -E -1 bug, add cjson lib and sample
+------------------------------------------------------------------------
+r264 | fangq | 2012-01-07 10:25:45 -0500 (Sat, 07 Jan 2012) | 1 line
+Changed paths:
+   M /mcextreme_cuda/trunk/src/Makefile
+   M /mcextreme_cuda/trunk/src/mcx_utils.c
+   M /mcextreme_cuda/trunk/src/mcx_utils.h
+
+support JSON format input file
+------------------------------------------------------------------------
+r263 | fangq | 2011-12-21 15:14:22 -0500 (Wed, 21 Dec 2011) | 1 line
+Changed paths:
+   M /mcextreme_cuda/trunk/ChangeLog.txt
+   M /mcextreme_cuda/trunk/README.txt
+   M /mcextreme_cuda/trunk/mcxlab/README.txt
+   M /mcextreme_cuda/trunk/src/mcx_utils.c
+
+tag for a potential release
+------------------------------------------------------------------------
+r262 | fangq | 2011-12-21 14:41:21 -0500 (Wed, 21 Dec 2011) | 1 line
+Changed paths:
+   M /mcextreme_cuda/trunk/src/mcx_core.cu
+
+fix to forward bias issue reported by Dave Giraud
+------------------------------------------------------------------------
+r258 | fangq | 2011-09-21 15:11:13 -0400 (Wed, 21 Sep 2011) | 1 line
+Changed paths:
+   M /mcextreme_cuda/trunk/ChangeLog.txt
+   M /mcextreme_cuda/trunk/README.txt
+   M /mcextreme_cuda/trunk/example/quicktest/qtest.inp
+   M /mcextreme_cuda/trunk/mcxlab/README.txt
+   M /mcextreme_cuda/trunk/mcxlab/mcxlab.m
+   M /mcextreme_cuda/trunk/mcxlab/mcxlab_atom.m
+   M /mcextreme_cuda/trunk/src/Makefile
+   M /mcextreme_cuda/trunk/src/mcx_core.cu
+   M /mcextreme_cuda/trunk/src/mcx_utils.c
+   M /mcextreme_cuda/trunk/src/mcxlab.cpp
+
+fix a regression in MCXLAB related to detectors, use exact exit position for radius test
+------------------------------------------------------------------------
+r257 | fangq | 2011-09-20 21:21:41 -0400 (Tue, 20 Sep 2011) | 1 line
+Changed paths:
+   M /mcextreme_cuda/trunk/doc/Download.txt
+   M /mcextreme_cuda/trunk/doc/FAQ.txt
+
+update online docs for 0.5.2 release
+------------------------------------------------------------------------
+r256 | fangq | 2011-09-20 18:34:44 -0400 (Tue, 20 Sep 2011) | 1 line
+Changed paths:
+   M /mcextreme_cuda/trunk/src/mcx_utils.c
+
+fix compilation issue on windows
+------------------------------------------------------------------------
+r255 | fangq | 2011-09-20 13:48:00 -0400 (Tue, 20 Sep 2011) | 1 line
+Changed paths:
+   M /mcextreme_cuda/trunk/ChangeLog.txt
+   M /mcextreme_cuda/trunk/README.txt
+   M /mcextreme_cuda/trunk/example/quicktest/qtest.inp
+   M /mcextreme_cuda/trunk/src/mcx_core.cu
+   M /mcextreme_cuda/trunk/src/mcx_utils.c
+
+update document to release 0.5.2
+------------------------------------------------------------------------
+r254 | fangq | 2011-09-20 01:06:28 -0400 (Tue, 20 Sep 2011) | 1 line
+Changed paths:
+   M /mcextreme_cuda/trunk/src/mcx_utils.c
+
+warning when timeout, warning when detector is off, accept srcfrom0 from inp file
+------------------------------------------------------------------------
+r253 | fangq | 2011-09-19 17:29:51 -0400 (Mon, 19 Sep 2011) | 1 line
+Changed paths:
+   M /mcextreme_cuda/trunk/example/masktest/mtest.inp
+   M /mcextreme_cuda/trunk/example/masktest/plotresults.m
+
+more tests with detmask, update plotting script
+------------------------------------------------------------------------
+r252 | fangq | 2011-09-19 13:31:31 -0400 (Mon, 19 Sep 2011) | 1 line
+Changed paths:
+   A /mcextreme_cuda/trunk/example/masktest
+   A /mcextreme_cuda/trunk/example/masktest/mtest.inp
+   A /mcextreme_cuda/trunk/example/masktest/plotresults.m
+   A /mcextreme_cuda/trunk/example/masktest/run_masktest.sh
+   M /mcextreme_cuda/trunk/src/mcx_utils.c
+
+fixing a bug in calculating detector masks with float input
+------------------------------------------------------------------------
+r251 | fangq | 2011-08-09 22:32:49 -0400 (Tue, 09 Aug 2011) | 1 line
+Changed paths:
+   M /mcextreme_cuda/trunk/README.txt
+   M /mcextreme_cuda/trunk/example/bubble/bubble.inp
+   M /mcextreme_cuda/trunk/example/quicktest/grid2x.inp
+   M /mcextreme_cuda/trunk/example/quicktest/grid3x.inp
+   M /mcextreme_cuda/trunk/example/quicktest/qtest.inp
+   M /mcextreme_cuda/trunk/example/speedtest/benchcpeed.inp
+   M /mcextreme_cuda/trunk/example/sphbox/spherebox.inp
+   M /mcextreme_cuda/trunk/example/validation/validation.inp
+   M /mcextreme_cuda/trunk/example/validation/validation_b.inp
+   M /mcextreme_cuda/trunk/example/validation/validation_dark.inp
+   M /mcextreme_cuda/trunk/example/validation/validation_dark_b.inp
+   M /mcextreme_cuda/trunk/mcxlab/mcxlab.m
+   M /mcextreme_cuda/trunk/mcxlab/mcxlab_atom.m
+   M /mcextreme_cuda/trunk/src/mcx_utils.c
+
+clarify the meaning and limitation of the voxel input in cfg file
+------------------------------------------------------------------------
+r250 | fangq | 2011-06-17 10:39:20 -0400 (Fri, 17 Jun 2011) | 1 line
+Changed paths:
+   M /mcextreme_cuda/trunk/src/mcx_utils.c
+   M /mcextreme_cuda/trunk/src/mcxlab.cpp
+
+warn if users give an unreasonable incident vector
+------------------------------------------------------------------------
+r249 | fangq | 2011-06-11 17:39:09 -0400 (Sat, 11 Jun 2011) | 1 line
+Changed paths:
+   M /mcextreme_cuda/trunk/ChangeLog.txt
+   M /mcextreme_cuda/trunk/README.txt
+   M /mcextreme_cuda/trunk/mcxlab/INSTALL.txt
+   M /mcextreme_cuda/trunk/mcxlab/README.txt
+   M /mcextreme_cuda/trunk/src/Makefile
+   M /mcextreme_cuda/trunk/src/mcxlab.cpp
+
+post 0.5.1 polishing
+------------------------------------------------------------------------
+r248 | fangq | 2011-06-06 15:50:39 -0400 (Mon, 06 Jun 2011) | 1 line
+Changed paths:
+   M /mcextreme_cuda/trunk/ChangeLog.txt
+   M /mcextreme_cuda/trunk/README.txt
+   M /mcextreme_cuda/trunk/doc/Download.txt
+   M /mcextreme_cuda/trunk/doc/FAQ.txt
+   A /mcextreme_cuda/trunk/example/sphbox/README.txt
+   M /mcextreme_cuda/trunk/src/mcx_core.cu
+   M /mcextreme_cuda/trunk/src/mcx_utils.c
+
+ready to release v0.5.1
+------------------------------------------------------------------------
+r247 | fangq | 2011-05-03 23:50:55 -0400 (Tue, 03 May 2011) | 1 line
+Changed paths:
+   M /mcextreme_cuda/trunk/src/mcx_core.cu
+
+record the true absorption before non-atomic loss for normalization
+------------------------------------------------------------------------
+r238 | fangq | 2011-04-26 18:55:54 -0400 (Tue, 26 Apr 2011) | 1 line
+Changed paths:
+   M /mcextreme_cuda/trunk/src/mcxlab.cpp
+
+change printed text string
+------------------------------------------------------------------------
+r237 | fangq | 2011-04-26 08:48:22 -0400 (Tue, 26 Apr 2011) | 1 line
+Changed paths:
+   M /mcextreme_cuda/trunk/src/mcx_core.cu
+   M /mcextreme_cuda/trunk/src/mcx_utils.c
+
+fix buffer length bug for cachebox mode
+------------------------------------------------------------------------
+r236 | fangq | 2011-04-26 08:47:17 -0400 (Tue, 26 Apr 2011) | 1 line
+Changed paths:
+   M /mcextreme_cuda/trunk/src/mcxlab.cpp
+
+allow crop0 crop1 input for the cachebox
+------------------------------------------------------------------------
+r235 | fangq | 2011-03-31 11:48:13 -0400 (Thu, 31 Mar 2011) | 1 line
+Changed paths:
+   M /mcextreme_cuda/trunk/mcxlab/README.txt
+   M /mcextreme_cuda/trunk/mcxlab/mcxlab.m
+   M /mcextreme_cuda/trunk/mcxlab/mcxlab_atom.m
+
+correct help info for cfg.issrcfrom0
+------------------------------------------------------------------------
+r234 | fangq | 2011-03-25 19:33:50 -0400 (Fri, 25 Mar 2011) | 1 line
+Changed paths:
+   M /mcextreme_cuda/trunk/src/Makefile
+
+tweak makefile for ocelot
+------------------------------------------------------------------------
+r233 | fangq | 2011-03-25 13:52:27 -0400 (Fri, 25 Mar 2011) | 1 line
+Changed paths:
+   M /mcextreme_cuda/trunk/src/Makefile
+   D /mcextreme_cuda/trunk/src/makefile_ocelot
+
+new ocelot makefile, make BACKEND=ocelot
+------------------------------------------------------------------------
+r232 | fangq | 2011-03-25 13:29:14 -0400 (Fri, 25 Mar 2011) | 1 line
+Changed paths:
+   M /mcextreme_cuda/trunk/mcxlab/mcxlab.m
+   A /mcextreme_cuda/trunk/mcxlab/mcxlab_atom.m
+   M /mcextreme_cuda/trunk/src/mcxlab.cpp
+
+remove help text from mcxlab.cpp,add mcxlab_atom help file
+------------------------------------------------------------------------
+r230 | fangq | 2011-03-20 10:58:06 -0400 (Sun, 20 Mar 2011) | 1 line
+Changed paths:
+   M /mcextreme_cuda/trunk/src/Makefile
+
+add mexbox option
+------------------------------------------------------------------------
+r229 | fangq | 2011-03-20 10:48:17 -0400 (Sun, 20 Mar 2011) | 1 line
+Changed paths:
+   A /mcextreme_cuda/trunk/mcxlab/INSTALL.txt
+   M /mcextreme_cuda/trunk/mcxlab/README.txt
+   M /mcextreme_cuda/trunk/mcxlab/examples/demo_mcxlab_basic.m
+
+more polishing of mcxlab docs
+------------------------------------------------------------------------
+r228 | fangq | 2011-03-18 16:59:22 -0400 (Fri, 18 Mar 2011) | 1 line
+Changed paths:
+   M /mcextreme_cuda/trunk/src/mcx_utils.h
+   M /mcextreme_cuda/trunk/src/mcxlab.cpp
+
+debugged and compiled on windows
+------------------------------------------------------------------------
+r227 | fangq | 2011-03-18 13:47:04 -0400 (Fri, 18 Mar 2011) | 1 line
+Changed paths:
+   M /mcextreme_cuda/trunk/README.txt
+   M /mcextreme_cuda/trunk/mcxlab/README.txt
+   D /mcextreme_cuda/trunk/mcxlab/init_mcxlab.m
+
+minor update to the documents
+------------------------------------------------------------------------
+r226 | fangq | 2011-03-18 13:33:41 -0400 (Fri, 18 Mar 2011) | 1 line
+Changed paths:
+   M /mcextreme_cuda/trunk/ChangeLog.txt
+   M /mcextreme_cuda/trunk/README.txt
+   M /mcextreme_cuda/trunk/doc/Download.txt
+   M /mcextreme_cuda/trunk/doc/FAQ.txt
+   M /mcextreme_cuda/trunk/doc/Get_Started.txt
+   M /mcextreme_cuda/trunk/doc/INSTALL.txt
+   M /mcextreme_cuda/trunk/mcxlab/README.txt
+   D /mcextreme_cuda/trunk/mcxlab/demo_mcxlab.m
+   A /mcextreme_cuda/trunk/mcxlab/examples/demo_mcxlab_basic.m (from /mcextreme_cuda/trunk/mcxlab/demo_mcxlab.m:222)
+   M /mcextreme_cuda/trunk/mcxlab/examples/demo_sphere_cube_subpixel.m
+   M /mcextreme_cuda/trunk/mcxlab/mcxlab.m
+   M /mcextreme_cuda/trunk/src/mcx_core.cu
+   M /mcextreme_cuda/trunk/src/mcx_utils.c
+   M /mcextreme_cuda/trunk/src/mcx_utils.h
+   M /mcextreme_cuda/trunk/src/mcxlab.cpp
+   M /mcextreme_cuda/trunk/utils/cwdiffusion.m
+   M /mcextreme_cuda/trunk/utils/loadmc2.m
+   M /mcextreme_cuda/trunk/utils/normalizemcx.m
+   M /mcextreme_cuda/trunk/utils/tddiffusion.m
+
+massive update of documentation
+------------------------------------------------------------------------
+r225 | fangq | 2011-03-18 10:38:50 -0400 (Fri, 18 Mar 2011) | 1 line
+Changed paths:
+   M /mcextreme_cuda/trunk/src/Makefile
+   M /mcextreme_cuda/trunk/src/mcx_utils.c
+   M /mcextreme_cuda/trunk/src/mcx_utils.h
+   M /mcextreme_cuda/trunk/src/mcxlab.cpp
+
+exception handling in MCXLAB
+------------------------------------------------------------------------
+r224 | fangq | 2011-03-18 00:21:57 -0400 (Fri, 18 Mar 2011) | 1 line
+Changed paths:
+   M /mcextreme_cuda/trunk/mcxlab/examples/demo_4layer_head.m
+   M /mcextreme_cuda/trunk/mcxlab/examples/demo_sphere_cube_subpixel.m
+   A /mcextreme_cuda/trunk/mcxlab/examples/demo_validation_heterogeneous.m
+   A /mcextreme_cuda/trunk/mcxlab/examples/demo_validation_homogeneous.m
+   M /mcextreme_cuda/trunk/src/mcx_core.cu
+
+mcxlab validation debugged and polished
+------------------------------------------------------------------------
+r223 | fangq | 2011-03-17 11:18:41 -0400 (Thu, 17 Mar 2011) | 1 line
+Changed paths:
+   M /mcextreme_cuda/trunk/src/Makefile
+   M /mcextreme_cuda/trunk/src/mcx_core.cu
+   M /mcextreme_cuda/trunk/src/mcxlab.cpp
+
+minor polishing of mcxlab and mcx_core
+------------------------------------------------------------------------
+r222 | fangq | 2011-03-16 19:17:57 -0400 (Wed, 16 Mar 2011) | 1 line
+Changed paths:
+   M /mcextreme_cuda/trunk/AUTHORS.txt
+   M /mcextreme_cuda/trunk/ChangeLog.txt
+   M /mcextreme_cuda/trunk/TODO.txt
+   M /mcextreme_cuda/trunk/mcxlab/demo_mcxlab.m
+   A /mcextreme_cuda/trunk/mcxlab/examples
+   A /mcextreme_cuda/trunk/mcxlab/examples/demo_4layer_head.m
+   A /mcextreme_cuda/trunk/mcxlab/examples/demo_sphere_cube_subpixel.m
+   A /mcextreme_cuda/trunk/mcxlab/init_mcxlab.m
+   M /mcextreme_cuda/trunk/mcxlab/mcxlab.m
+   M /mcextreme_cuda/trunk/src/mcx_core.cu
+   M /mcextreme_cuda/trunk/src/mcx_core.h
+   M /mcextreme_cuda/trunk/src/mcx_utils.c
+   M /mcextreme_cuda/trunk/src/mcx_utils.h
+   M /mcextreme_cuda/trunk/src/mcxlab.cpp
+
+recode internal reflection, major improvement for mcxlab; new mcxlab samples
+------------------------------------------------------------------------
+r221 | fangq | 2011-03-15 17:45:01 -0400 (Tue, 15 Mar 2011) | 1 line
+Changed paths:
+   M /mcextreme_cuda/trunk/doc/Download.txt
+   M /mcextreme_cuda/trunk/doc/FAQ.txt
+   M /mcextreme_cuda/trunk/doc/Get_Started.txt
+   M /mcextreme_cuda/trunk/doc/INSTALL.txt
+   M /mcextreme_cuda/trunk/doc/gendoc.sh
+   M /mcextreme_cuda/trunk/src/mcx_core.cu
+   M /mcextreme_cuda/trunk/src/mcx_core.h
+   M /mcextreme_cuda/trunk/src/mcx_utils.c
+   M /mcextreme_cuda/trunk/src/mcxlab.cpp
+
+extensive debugging with --unitinmm flag
+------------------------------------------------------------------------
+r220 | fangq | 2011-03-10 12:56:11 -0500 (Thu, 10 Mar 2011) | 1 line
+Changed paths:
+   M /mcextreme_cuda/trunk/ChangeLog.txt
+   A /mcextreme_cuda/trunk/mcxlab
+   A /mcextreme_cuda/trunk/mcxlab/LICENSE.txt
+   A /mcextreme_cuda/trunk/mcxlab/README.txt
+   A /mcextreme_cuda/trunk/mcxlab/demo_mcxlab.m (from /mcextreme_cuda/trunk/utils/demo_mcxlab.m:217)
+   A /mcextreme_cuda/trunk/mcxlab/mcxlab.m
+   M /mcextreme_cuda/trunk/src/Makefile
+   M /mcextreme_cuda/trunk/src/mcxlab.cpp
+   D /mcextreme_cuda/trunk/utils/demo_mcxlab.m
+
+store MCXLAB in a top-level folder
+------------------------------------------------------------------------
+r219 | fangq | 2011-03-09 23:32:51 -0500 (Wed, 09 Mar 2011) | 1 line
+Changed paths:
+   M /mcextreme_cuda/trunk/src/mcxlab.cpp
+
+mcxlab works beautifully with detected photons
+------------------------------------------------------------------------
+r218 | fangq | 2011-03-09 19:38:44 -0500 (Wed, 09 Mar 2011) | 1 line
+Changed paths:
+   M /mcextreme_cuda/trunk/src/Makefile
+   M /mcextreme_cuda/trunk/src/mcxlab.cpp
+
+update usage to support octave
+------------------------------------------------------------------------
+r217 | fangq | 2011-03-09 19:34:06 -0500 (Wed, 09 Mar 2011) | 1 line
+Changed paths:
+   M /mcextreme_cuda/trunk/src/Makefile
+   M /mcextreme_cuda/trunk/src/mcx_core.cu
+   M /mcextreme_cuda/trunk/src/mcx_utils.c
+   M /mcextreme_cuda/trunk/src/mcx_utils.h
+   M /mcextreme_cuda/trunk/src/mcxlab.cpp
+   M /mcextreme_cuda/trunk/utils/demo_mcxlab.m
+
+mcxlab support output parameters, add Octave support with make oct
+------------------------------------------------------------------------
+r216 | fangq | 2011-03-03 23:23:51 -0500 (Thu, 03 Mar 2011) | 1 line
+Changed paths:
+   M /mcextreme_cuda/trunk/src/mcx_utils.c
+   M /mcextreme_cuda/trunk/src/mcxlab.cpp
+
+use -E to set seed from command line
+------------------------------------------------------------------------
+r215 | fangq | 2010-12-28 17:37:44 -0500 (Tue, 28 Dec 2010) | 1 line
+Changed paths:
+   M /mcextreme_cuda/trunk/example/validation/run_validation.sh
+   M /mcextreme_cuda/trunk/src/mcx_core.cu
+   M /mcextreme_cuda/trunk/src/mcx_utils.c
+   M /mcextreme_cuda/trunk/src/tictoc.c
+
+use negative -R to enable cachebox defined in the input file, fix time wraping
+------------------------------------------------------------------------
+r214 | fangq | 2010-08-15 01:22:53 -0400 (Sun, 15 Aug 2010) | 1 line
+Changed paths:
+   M /mcextreme_cuda/trunk/src/Makefile
+
+debug make mex option for Linux
+------------------------------------------------------------------------
+r213 | fangq | 2010-08-15 01:14:18 -0400 (Sun, 15 Aug 2010) | 1 line
+Changed paths:
+   A /mcextreme_cuda/trunk/example/sphbox/plotresults.m
+   M /mcextreme_cuda/trunk/example/sphbox/runspherebox.sh
+   A /mcextreme_cuda/trunk/example/sphbox/sphdiffsemiinf.mat
+   M /mcextreme_cuda/trunk/src/Makefile
+   M /mcextreme_cuda/trunk/src/mcx_core.cu
+   M /mcextreme_cuda/trunk/src/mcx_utils.c
+   M /mcextreme_cuda/trunk/src/mcxlab.cpp
+   M /mcextreme_cuda/trunk/utils/demo_mcxlab.m
+
+add make mex in the Makefile
+------------------------------------------------------------------------
+r212 | fangq | 2010-08-14 10:46:15 -0400 (Sat, 14 Aug 2010) | 1 line
+Changed paths:
+   M /mcextreme_cuda/trunk/src/mcx_utils.c
+   M /mcextreme_cuda/trunk/src/mcx_utils.h
+
+debugged with g++, fix const and unsigned warnings
+------------------------------------------------------------------------
+r211 | fangq | 2010-08-10 01:01:00 -0400 (Tue, 10 Aug 2010) | 1 line
+Changed paths:
+   M /mcextreme_cuda/trunk/src/mexmcx.m
+   A /mcextreme_cuda/trunk/utils/demo_mcxlab.m
+
+add demo for mcxlab
+------------------------------------------------------------------------
+r210 | fangq | 2010-08-10 00:49:59 -0400 (Tue, 10 Aug 2010) | 1 line
+Changed paths:
+   M /mcextreme_cuda/trunk/src/Makefile
+   M /mcextreme_cuda/trunk/src/mcx_core.cu
+   M /mcextreme_cuda/trunk/src/mcx_utils.c
+   M /mcextreme_cuda/trunk/src/mcxlab.cpp
+   R /mcextreme_cuda/trunk/src/mexmcx.m
+
+mcxlab succeeded in matlab, setting proper default values for cfg
+------------------------------------------------------------------------
+r209 | fangq | 2010-08-09 13:10:27 -0400 (Mon, 09 Aug 2010) | 1 line
+Changed paths:
+   M /mcextreme_cuda/trunk/src/mcx_utils.c
+   M /mcextreme_cuda/trunk/src/mcxlab.cpp
+
+more debugging on mcxlab, not fully working yet
+------------------------------------------------------------------------
+r208 | fangq | 2010-08-09 01:12:51 -0400 (Mon, 09 Aug 2010) | 1 line
+Changed paths:
+   A /mcextreme_cuda/trunk/src/mexmcx.m
+
+add mcxlab compilation script
+------------------------------------------------------------------------
+r207 | fangq | 2010-08-09 01:03:49 -0400 (Mon, 09 Aug 2010) | 1 line
+Changed paths:
+   M /mcextreme_cuda/trunk/src/Makefile
+   M /mcextreme_cuda/trunk/src/mcx_utils.c
+   A /mcextreme_cuda/trunk/src/mcxlab.cpp
+
+initial addition of Matlab wrapper: mcxlab
+------------------------------------------------------------------------
+r206 | fangq | 2010-08-08 22:37:08 -0400 (Sun, 08 Aug 2010) | 1 line
+Changed paths:
+   M /mcextreme_cuda/trunk/src/Makefile
+   M /mcextreme_cuda/trunk/src/mcx_core.cu
+   M /mcextreme_cuda/trunk/src/mcx_utils.c
+
+add -O3 in gcc flags
+------------------------------------------------------------------------
+r205 | fangq | 2010-08-08 18:37:46 -0400 (Sun, 08 Aug 2010) | 1 line
+Changed paths:
+   M /mcextreme_cuda/trunk/mcxstudio/mcxgui.lfm
+   M /mcextreme_cuda/trunk/mcxstudio/mcxgui.lrs
+   M /mcextreme_cuda/trunk/mcxstudio/mcxgui.pas
+   M /mcextreme_cuda/trunk/mcxstudio/mcxstudio.lpi
+   M /mcextreme_cuda/trunk/mcxstudio/mcxstudio.rc
+
+add unitinmm in the command line
+------------------------------------------------------------------------
+r204 | fangq | 2010-08-08 18:02:29 -0400 (Sun, 08 Aug 2010) | 1 line
+Changed paths:
+   A /mcextreme_cuda/trunk/example/quicktest/grid2x.inp
+   A /mcextreme_cuda/trunk/example/quicktest/grid3x.inp
+   M /mcextreme_cuda/trunk/example/quicktest/qtest.inp
+   A /mcextreme_cuda/trunk/example/quicktest/run_grid2x.sh
+   A /mcextreme_cuda/trunk/example/quicktest/run_grid3x.sh
+   M /mcextreme_cuda/trunk/src/mcx_core.cu
+   M /mcextreme_cuda/trunk/src/mcx_utils.c
+
+debugged --unitinmm flag
+------------------------------------------------------------------------
+r203 | fangq | 2010-08-08 00:41:49 -0400 (Sun, 08 Aug 2010) | 1 line
+Changed paths:
+   M /mcextreme_cuda/trunk/src/mcx_core.cu
+
+tested with sphbox example
+------------------------------------------------------------------------
+r202 | fangq | 2010-08-07 21:14:04 -0400 (Sat, 07 Aug 2010) | 1 line
+Changed paths:
+   M /mcextreme_cuda/trunk/src/mcx_core.cu
+   M /mcextreme_cuda/trunk/src/mcx_core.h
+   M /mcextreme_cuda/trunk/src/mcx_utils.c
+   M /mcextreme_cuda/trunk/src/mcx_utils.h
+
+use -B flag for internal reflection
+------------------------------------------------------------------------
+r201 | fangq | 2010-08-05 23:18:08 -0400 (Thu, 05 Aug 2010) | 1 line
+Changed paths:
+   M /mcextreme_cuda/trunk/mcxstudio/mcxgui.lfm
+   M /mcextreme_cuda/trunk/mcxstudio/mcxgui.lrs
+   M /mcextreme_cuda/trunk/mcxstudio/mcxgui.pas
+   M /mcextreme_cuda/trunk/mcxstudio/mcxstudio.lpi
+   M /mcextreme_cuda/trunk/mcxstudio/mcxstudio.rc
+
+polishing text messages
+------------------------------------------------------------------------
+r200 | fangq | 2010-08-05 23:17:32 -0400 (Thu, 05 Aug 2010) | 1 line
+Changed paths:
+   M /mcextreme_cuda/trunk/src/mcx_core.cu
+   M /mcextreme_cuda/trunk/src/mcx_utils.c
+   M /mcextreme_cuda/trunk/src/mcx_utils.h
+
+initial code supporting reflection at internal boundary, not tested
+------------------------------------------------------------------------
+r199 | fangq | 2010-08-02 23:28:17 -0400 (Mon, 02 Aug 2010) | 1 line
+Changed paths:
+   M /mcextreme_cuda/trunk/src/mcx_core.cu
+
+estimate maxgate with autopilot mode
+------------------------------------------------------------------------
+r198 | fangq | 2010-08-02 21:50:07 -0400 (Mon, 02 Aug 2010) | 1 line
+Changed paths:
+   M /mcextreme_cuda/trunk/mcxstudio/mcxgui.lfm
+   M /mcextreme_cuda/trunk/mcxstudio/mcxgui.lrs
+   M /mcextreme_cuda/trunk/mcxstudio/mcxgui.pas
+   M /mcextreme_cuda/trunk/mcxstudio/mcxstudio.lpi
+   M /mcextreme_cuda/trunk/mcxstudio/mcxstudio.rc
+
+new GUI polishing, fixing mcxp saving bug
+------------------------------------------------------------------------
+r197 | fangq | 2010-08-02 16:48:27 -0400 (Mon, 02 Aug 2010) | 1 line
+Changed paths:
+   M /mcextreme_cuda/trunk/mcxstudio/mcxgui.lfm
+   M /mcextreme_cuda/trunk/mcxstudio/mcxgui.lrs
+   M /mcextreme_cuda/trunk/mcxstudio/mcxgui.pas
+   M /mcextreme_cuda/trunk/mcxstudio/mcxstudio.lpi
+   M /mcextreme_cuda/trunk/mcxstudio/mcxstudio.rc
+   M /mcextreme_cuda/trunk/src/mcx_core.cu
+   M /mcextreme_cuda/trunk/src/mcx_utils.c
+   M /mcextreme_cuda/trunk/utils/loadmch.m
+
+fix bugs when saving multiple blocks of mch, update loadmch, update GUI
+------------------------------------------------------------------------
+r196 | fangq | 2010-08-01 19:21:27 -0400 (Sun, 01 Aug 2010) | 1 line
+Changed paths:
+   M /mcextreme_cuda/trunk/README.txt
+
+minor touch to README file
+------------------------------------------------------------------------
+r194 | fangq | 2010-08-01 18:29:06 -0400 (Sun, 01 Aug 2010) | 1 line
+Changed paths:
+   M /mcextreme_cuda/trunk/mcxstudio/mcxabout.lfm
+   M /mcextreme_cuda/trunk/mcxstudio/mcxabout.lrs
+   M /mcextreme_cuda/trunk/mcxstudio/mcxgui.lfm
+   M /mcextreme_cuda/trunk/mcxstudio/mcxgui.lrs
+   M /mcextreme_cuda/trunk/mcxstudio/mcxgui.pas
+   M /mcextreme_cuda/trunk/mcxstudio/mcxstudio.lpi
+   M /mcextreme_cuda/trunk/mcxstudio/mcxstudio.rc
+
+update mcxstudio for v0.4.9
+------------------------------------------------------------------------
+r193 | fangq | 2010-08-01 08:34:43 -0400 (Sun, 01 Aug 2010) | 1 line
+Changed paths:
+   M /mcextreme_cuda/trunk/ChangeLog.txt
+   M /mcextreme_cuda/trunk/README.txt
+   M /mcextreme_cuda/trunk/TODO.txt
+   M /mcextreme_cuda/trunk/src/mcx_core.cu
+   M /mcextreme_cuda/trunk/src/mcx_utils.c
+
+update documents for 0.4.9
+------------------------------------------------------------------------
+r192 | fangq | 2010-07-31 23:54:22 -0400 (Sat, 31 Jul 2010) | 1 line
+Changed paths:
+   M /mcextreme_cuda/trunk/src/mcx_core.cu
+   M /mcextreme_cuda/trunk/src/mcx_core.h
+   M /mcextreme_cuda/trunk/src/mcx_utils.c
+
+fix critical bug: pre-fermi hardware can not handle uchar in struct
+------------------------------------------------------------------------
+r191 | fangq | 2010-07-31 01:02:27 -0400 (Sat, 31 Jul 2010) | 1 line
+Changed paths:
+   M /mcextreme_cuda/trunk/example/quicktest/qtest.inp
+   M /mcextreme_cuda/trunk/example/quicktest/run_qtest.sh
+   M /mcextreme_cuda/trunk/src/mcx_core.cu
+   M /mcextreme_cuda/trunk/src/mcx_utils.c
+   M /mcextreme_cuda/trunk/src/mcx_utils.h
+
+switch to total photon number, use autopilot mode
+------------------------------------------------------------------------
+r190 | fangq | 2010-07-30 11:32:55 -0400 (Fri, 30 Jul 2010) | 1 line
+Changed paths:
+   M /mcextreme_cuda/trunk/src/mcx_core.cu
+   M /mcextreme_cuda/trunk/src/mcx_utils.c
+
+report simulation speed, test media volume before use
+------------------------------------------------------------------------
+r189 | fangq | 2010-07-30 01:24:00 -0400 (Fri, 30 Jul 2010) | 1 line
+Changed paths:
+   M /mcextreme_cuda/trunk/ChangeLog.txt
+   M /mcextreme_cuda/trunk/src/mcx_core.cu
+   M /mcextreme_cuda/trunk/src/mcx_utils.c
+
+tag revision number for core units
+------------------------------------------------------------------------
+r188 | fangq | 2010-07-30 01:14:55 -0400 (Fri, 30 Jul 2010) | 1 line
+Changed paths:
+   M /mcextreme_cuda/trunk/src/mcx_core.cu
+
+fix a bug when reading media with detector mask
+------------------------------------------------------------------------
+r187 | fangq | 2010-07-29 23:07:56 -0400 (Thu, 29 Jul 2010) | 1 line
+Changed paths:
+   M /mcextreme_cuda/trunk/src/Makefile
+   M /mcextreme_cuda/trunk/src/mcx_core.cu
+   M /mcextreme_cuda/trunk/src/mcx_utils.h
+
+placeholder for MCX_CUDA_ARCH
+------------------------------------------------------------------------
+r186 | fangq | 2010-07-29 19:15:54 -0400 (Thu, 29 Jul 2010) | 1 line
+Changed paths:
+   M /mcextreme_cuda/trunk/src/mcx_core.cu
+
+remove the unreferenced macro
+------------------------------------------------------------------------
+r185 | fangq | 2010-07-29 19:09:11 -0400 (Thu, 29 Jul 2010) | 1 line
+Changed paths:
+   M /mcextreme_cuda/trunk/src/mcx_core.cu
+   M /mcextreme_cuda/trunk/utils/loadmch.m
+
+__CUDA_ARCH__ is only available in device kernels
+------------------------------------------------------------------------
+r184 | fangq | 2010-07-29 17:44:43 -0400 (Thu, 29 Jul 2010) | 1 line
+Changed paths:
+   M /mcextreme_cuda/trunk/AUTHORS.txt
+   M /mcextreme_cuda/trunk/ChangeLog.txt
+   M /mcextreme_cuda/trunk/README.txt
+   M /mcextreme_cuda/trunk/TODO.txt
+
+update changelog and documents
+------------------------------------------------------------------------
+r183 | fangq | 2010-07-29 17:18:32 -0400 (Thu, 29 Jul 2010) | 1 line
+Changed paths:
+   M /mcextreme_cuda/trunk/src/mcx_utils.c
+
+minor typo correction
+------------------------------------------------------------------------
+r182 | fangq | 2010-07-29 17:09:53 -0400 (Thu, 29 Jul 2010) | 1 line
+Changed paths:
+   M /mcextreme_cuda/trunk/src/mcx_utils.c
+
+compiled on windows with cuda 2.3
+------------------------------------------------------------------------
+r181 | fangq | 2010-07-29 13:24:00 -0400 (Thu, 29 Jul 2010) | 1 line
+Changed paths:
+   M /mcextreme_cuda/trunk/src/Makefile
+   M /mcextreme_cuda/trunk/src/mcx_core.cu
+   M /mcextreme_cuda/trunk/src/mcx_utils.c
+   M /mcextreme_cuda/trunk/utils/loadmch.m
+
+print MCX compilation parameters, return struct for loadmch
+------------------------------------------------------------------------
+r180 | fangq | 2010-07-29 11:28:37 -0400 (Thu, 29 Jul 2010) | 1 line
+Changed paths:
+   M /mcextreme_cuda/trunk/src/Makefile
+   M /mcextreme_cuda/trunk/src/mcx_core.cu
+   M /mcextreme_cuda/trunk/src/mcx_core.h
+   M /mcextreme_cuda/trunk/src/mcx_utils.c
+   M /mcextreme_cuda/trunk/src/mcx_utils.h
+
+use atomic with shared memory cache to improve accuracy near the source
+------------------------------------------------------------------------
+r179 | fangq | 2010-07-28 15:47:30 -0400 (Wed, 28 Jul 2010) | 1 line
+Changed paths:
+   A /mcextreme_cuda/trunk/example/sphbox
+   A /mcextreme_cuda/trunk/example/sphbox/createmcxbin.m
+   A /mcextreme_cuda/trunk/example/sphbox/runspherebox.sh
+   A /mcextreme_cuda/trunk/example/sphbox/spherebox.bin
+   A /mcextreme_cuda/trunk/example/sphbox/spherebox.inp
+
+add example for validation of MCX in heterogeneous media
+------------------------------------------------------------------------
+r178 | fangq | 2010-07-28 15:47:07 -0400 (Wed, 28 Jul 2010) | 1 line
+Changed paths:
+   M /mcextreme_cuda/trunk/src/Makefile
+   M /mcextreme_cuda/trunk/src/mcx_core.cu
+   M /mcextreme_cuda/trunk/src/mcx_core.h
+
+use RNG to determine transmission or reflection, make det for saving detectors
+------------------------------------------------------------------------
+r177 | fangq | 2010-07-28 13:17:25 -0400 (Wed, 28 Jul 2010) | 1 line
+Changed paths:
+   M /mcextreme_cuda/trunk/src/mcx_core.cu
+   M /mcextreme_cuda/trunk/utils/loadmch.m
+
+modularize photon saving at the detector
+------------------------------------------------------------------------
+r176 | fangq | 2010-07-28 11:20:45 -0400 (Wed, 28 Jul 2010) | 1 line
+Changed paths:
+   M /mcextreme_cuda/trunk/src/mcx_core.cu
+   M /mcextreme_cuda/trunk/src/mcx_utils.c
+   M /mcextreme_cuda/trunk/src/mcx_utils.h
+   M /mcextreme_cuda/trunk/utils/loadmch.m
+
+use column major as the internal format, remove all index order tests
+------------------------------------------------------------------------
+r175 | fangq | 2010-07-27 19:08:54 -0400 (Tue, 27 Jul 2010) | 1 line
+Changed paths:
+   M /mcextreme_cuda/trunk/src/mcx_const.h
+   M /mcextreme_cuda/trunk/src/mcx_core.cu
+   M /mcextreme_cuda/trunk/src/mcx_core.h
+   M /mcextreme_cuda/trunk/src/mcx_utils.c
+   M /mcextreme_cuda/trunk/src/mcx_utils.h
+   A /mcextreme_cuda/trunk/utils/loadmch.m
+
+support saving detected photons, but got 20% slower
+------------------------------------------------------------------------
+r174 | fangq | 2010-07-15 01:47:52 -0400 (Thu, 15 Jul 2010) | 1 line
+Changed paths:
+   M /mcextreme_cuda/trunk/src/makefile_ocelot
+   M /mcextreme_cuda/trunk/src/mcx_core.cu
+   M /mcextreme_cuda/trunk/src/mcx_utils.c
+   M /mcextreme_cuda/trunk/src/mcx_utils.h
+
+users can use -u to specify voxel edge length in mm
+------------------------------------------------------------------------
+r173 | fangq | 2010-07-12 14:41:50 -0400 (Mon, 12 Jul 2010) | 1 line
+Changed paths:
+   M /mcextreme_cuda/trunk/src/mcx_core.cu
+
+fixing a bug for indexing error for large volumes
+------------------------------------------------------------------------
+r172 | fangq | 2010-07-10 22:53:12 -0400 (Sat, 10 Jul 2010) | 1 line
+Changed paths:
+   M /mcextreme_cuda/trunk/src/mcx_core.cu
+
+tried to solve the multiple time gate initialization bug
+------------------------------------------------------------------------
+r171 | fangq | 2010-07-09 11:04:17 -0400 (Fri, 09 Jul 2010) | 1 line
+Changed paths:
+   M /mcextreme_cuda/trunk/src/mcx_utils.c
+   M /mcextreme_cuda/trunk/src/mcx_utils.h
+
+add flag -z to let src/det positions start from 0 instead of 1
+------------------------------------------------------------------------
+r170 | fangq | 2010-07-09 10:36:13 -0400 (Fri, 09 Jul 2010) | 1 line
+Changed paths:
+   M /mcextreme_cuda/trunk/src/Makefile
+   M /mcextreme_cuda/trunk/src/mcx_core.cu
+   M /mcextreme_cuda/trunk/src/mcx_utils.c
+   M /mcextreme_cuda/trunk/src/mcx_utils.h
+
+append data for multiple time gate groups
+------------------------------------------------------------------------
+r169 | fangq | 2010-07-01 15:35:10 -0400 (Thu, 01 Jul 2010) | 1 line
+Changed paths:
+   M /mcextreme_cuda/trunk/example/quicktest/qtest.inp
+
+standard benchmark to match my paper
+------------------------------------------------------------------------
+r168 | fangq | 2010-06-26 12:27:05 -0400 (Sat, 26 Jun 2010) | 1 line
+Changed paths:
+   M /mcextreme_cuda/trunk/example/quicktest/qtest.inp
+
+standard speed testing program
+------------------------------------------------------------------------
+r167 | fangq | 2010-06-26 12:15:09 -0400 (Sat, 26 Jun 2010) | 1 line
+Changed paths:
+   M /mcextreme_cuda/trunk/src/mcextreme.c
+   M /mcextreme_cuda/trunk/src/mcx_core.cu
+   M /mcextreme_cuda/trunk/src/mcx_core.h
+   M /mcextreme_cuda/trunk/src/mcx_utils.c
+   M /mcextreme_cuda/trunk/src/mcx_utils.h
+
+use constant memory to pass kernel param, no speed improvement, add error line info
+------------------------------------------------------------------------
+r166 | fangq | 2010-06-26 10:12:20 -0400 (Sat, 26 Jun 2010) | 1 line
+Changed paths:
+   M /mcextreme_cuda/trunk/src/mcx_core.cu
+   M /mcextreme_cuda/trunk/src/mcx_core.h
+
+further improve readability by renaming variables
+------------------------------------------------------------------------
+r165 | fangq | 2010-06-26 01:44:44 -0400 (Sat, 26 Jun 2010) | 1 line
+Changed paths:
+   M /mcextreme_cuda/trunk/src/mcx_core.cu
+   M /mcextreme_cuda/trunk/src/mcx_core.h
+
+use meaningful struct in the kernel to improve readability
+------------------------------------------------------------------------
+r164 | fangq | 2010-06-26 01:43:48 -0400 (Sat, 26 Jun 2010) | 1 line
+Changed paths:
+   M /mcextreme_cuda/trunk/src/logistic_rand.cu
+   M /mcextreme_cuda/trunk/src/mt_rand_s.cu
+
+add more rand functions for internal reflection
+------------------------------------------------------------------------
+r163 | fangq | 2010-05-14 15:33:40 -0400 (Fri, 14 May 2010) | 1 line
+Changed paths:
+   M /mcextreme_cuda/trunk/src/Makefile
+   M /mcextreme_cuda/trunk/src/mcextreme.c
+   M /mcextreme_cuda/trunk/src/mcx_core.cu
+   M /mcextreme_cuda/trunk/src/mcx_core.h
+   M /mcextreme_cuda/trunk/src/mcx_utils.c
+   M /mcextreme_cuda/trunk/src/mcx_utils.h
+
+allow to select which GPU to use with the -G option
+------------------------------------------------------------------------
+r162 | fangq | 2010-02-26 12:55:41 -0500 (Fri, 26 Feb 2010) | 1 line
+Changed paths:
+   M /mcextreme_cuda/trunk/TODO.txt
+
+updated changelog
+------------------------------------------------------------------------
+r161 | fangq | 2010-02-18 16:13:45 -0500 (Thu, 18 Feb 2010) | 1 line
+Changed paths:
+   M /mcextreme_cuda/trunk/src/mcx_core.cu
+
+replacing two conditions by clamping
+------------------------------------------------------------------------
+r160 | fangq | 2010-02-05 19:30:32 -0500 (Fri, 05 Feb 2010) | 1 line
+Changed paths:
+   M /mcextreme_cuda/trunk/src/Makefile
+   M /mcextreme_cuda/trunk/src/mcx_core.cu
+
+debug for snow-leopard
+------------------------------------------------------------------------
+r159 | fangq | 2010-02-04 15:32:06 -0500 (Thu, 04 Feb 2010) | 1 line
+Changed paths:
+   M /mcextreme_cuda/trunk/src/mcx_core.cu
+
+fixing NaN error detected by ocelot
+------------------------------------------------------------------------
+r158 | fangq | 2010-01-26 13:28:49 -0500 (Tue, 26 Jan 2010) | 1 line
+Changed paths:
+   A /mcextreme_cuda/trunk/src/makefile_ocelot
+
+add ocelot makefile for multicore CPU
+------------------------------------------------------------------------
+r156 | fangq | 2009-12-19 19:02:58 -0500 (Sat, 19 Dec 2009) | 1 line
+Changed paths:
+   M /mcextreme_cuda/trunk/ChangeLog.txt
+
+0.2 final changelog
+------------------------------------------------------------------------
+r155 | fangq | 2009-12-19 18:57:32 -0500 (Sat, 19 Dec 2009) | 1 line
+Changed paths:
+   M /mcextreme_cuda/trunk/src/mcx_core.cu
+   M /mcextreme_cuda/trunk/src/mcx_utils.c
+
+adjust keywords width once more
+------------------------------------------------------------------------
+r154 | fangq | 2009-12-19 18:55:53 -0500 (Sat, 19 Dec 2009) | 1 line
+Changed paths:
+   M /mcextreme_cuda/trunk/src/mcx_core.cu
+   M /mcextreme_cuda/trunk/src/mcx_utils.c
+
+adjust keywords width again
+------------------------------------------------------------------------
+r153 | fangq | 2009-12-19 18:52:31 -0500 (Sat, 19 Dec 2009) | 1 line
+Changed paths:
+   M /mcextreme_cuda/trunk/src/mcx_core.cu
+
+adjust keywords width
+------------------------------------------------------------------------
+r152 | fangq | 2009-12-19 18:51:08 -0500 (Sat, 19 Dec 2009) | 1 line
+Changed paths:
+   M /mcextreme_cuda/trunk/src/mcx_core.cu
+   M /mcextreme_cuda/trunk/src/mcx_utils.c
+
+propset all keywords first, try again
+------------------------------------------------------------------------
+r151 | fangq | 2009-12-19 18:49:33 -0500 (Sat, 19 Dec 2009) | 1 line
+Changed paths:
+   M /mcextreme_cuda/trunk/src/mcx_core.cu
+   M /mcextreme_cuda/trunk/src/mcx_utils.c
+
+one more try to set svn keywords
+------------------------------------------------------------------------
+r150 | fangq | 2009-12-19 18:46:08 -0500 (Sat, 19 Dec 2009) | 1 line
+Changed paths:
+   M /mcextreme_cuda/trunk/src/mcx_core.cu
+   M /mcextreme_cuda/trunk/src/mcx_utils.c
+
+another attempt to set svn keywords
+------------------------------------------------------------------------
+r149 | fangq | 2009-12-19 18:39:52 -0500 (Sat, 19 Dec 2009) | 1 line
+Changed paths:
+   M /mcextreme_cuda/trunk/src/mcx_core.cu
+   M /mcextreme_cuda/trunk/src/mcx_utils.c
+
+update svn keywords
+------------------------------------------------------------------------
+r148 | fangq | 2009-12-19 18:33:33 -0500 (Sat, 19 Dec 2009) | 1 line
+Changed paths:
+   M /mcextreme_cuda/trunk/doc/Download.txt
+   M /mcextreme_cuda/trunk/src/mcx_core.cu
+   M /mcextreme_cuda/trunk/src/mcx_utils.c
+
+add svn keywords
+------------------------------------------------------------------------
+r147 | fangq | 2009-12-19 18:16:12 -0500 (Sat, 19 Dec 2009) | 1 line
+Changed paths:
+   M /mcextreme_cuda/trunk/doc/Download.txt
+   M /mcextreme_cuda/trunk/doc/FAQ.txt
+   M /mcextreme_cuda/trunk/doc/Get_Started.txt
+   M /mcextreme_cuda/trunk/doc/INSTALL.txt
+   M /mcextreme_cuda/trunk/doc/gendoc.sh
+   M /mcextreme_cuda/trunk/example/quicktest/README.txt
+
+update documents, get ready for 0.2 final
+------------------------------------------------------------------------
+r146 | fangq | 2009-12-19 14:28:00 -0500 (Sat, 19 Dec 2009) | 1 line
+Changed paths:
+   M /mcextreme_cuda/trunk/mcxstudio/mcxgui.lfm
+   M /mcextreme_cuda/trunk/mcxstudio/mcxgui.lrs
+   M /mcextreme_cuda/trunk/mcxstudio/mcxgui.pas
+   M /mcextreme_cuda/trunk/mcxstudio/mcxstudio.lpi
+   M /mcextreme_cuda/trunk/mcxstudio/mcxstudio.rc
+
+adjust toolbutton enable disable status and add icon
+------------------------------------------------------------------------
+r145 | fangq | 2009-12-19 14:06:52 -0500 (Sat, 19 Dec 2009) | 1 line
+Changed paths:
+   M /mcextreme_cuda/trunk/example/benchrng/Makefile
+   M /mcextreme_cuda/trunk/example/benchrng/rngspeed.cu
+   M /mcextreme_cuda/trunk/example/benchrng/runbench.sh
+   M /mcextreme_cuda/trunk/example/quicktest/run_qtest_silent.sh
+   M /mcextreme_cuda/trunk/example/speedtest/README.txt
+   M /mcextreme_cuda/trunk/example/speedtest/genreport.sh
+
+test all examples
+------------------------------------------------------------------------
+r144 | fangq | 2009-12-19 11:33:05 -0500 (Sat, 19 Dec 2009) | 1 line
+Changed paths:
+   M /mcextreme_cuda/trunk/src/Makefile
+
+Makefile minor rewording
+------------------------------------------------------------------------
+r143 | fangq | 2009-12-19 11:23:14 -0500 (Sat, 19 Dec 2009) | 1 line
+Changed paths:
+   M /mcextreme_cuda/trunk/mcxstudio/mcxabout.lfm
+   M /mcextreme_cuda/trunk/mcxstudio/mcxabout.lrs
+   M /mcextreme_cuda/trunk/mcxstudio/mcxgui.lfm
+   M /mcextreme_cuda/trunk/mcxstudio/mcxgui.lrs
+   M /mcextreme_cuda/trunk/mcxstudio/mcxgui.pas
+   M /mcextreme_cuda/trunk/mcxstudio/mcxstudio.ico
+   M /mcextreme_cuda/trunk/mcxstudio/mcxstudio.lpi
+   M /mcextreme_cuda/trunk/mcxstudio/mcxstudio.lrs
+   M /mcextreme_cuda/trunk/mcxstudio/mcxstudio.rc
+
+fine tune mcx studio
+------------------------------------------------------------------------
+r142 | fangq | 2009-12-19 00:29:54 -0500 (Sat, 19 Dec 2009) | 1 line
+Changed paths:
+   M /mcextreme_cuda/trunk/example/speedtest/README.txt
+   M /mcextreme_cuda/trunk/example/speedtest/runspeedbench.sh
+
+speed settings for dedicated GPU
+------------------------------------------------------------------------
+r141 | fangq | 2009-12-18 23:27:08 -0500 (Fri, 18 Dec 2009) | 1 line
+Changed paths:
+   M /mcextreme_cuda/trunk/mcxstudio/mcxabout.lfm
+   M /mcextreme_cuda/trunk/mcxstudio/mcxabout.lrs
+   M /mcextreme_cuda/trunk/mcxstudio/mcxstudio.lpi
+   M /mcextreme_cuda/trunk/mcxstudio/mcxstudio.rc
+   M /mcextreme_cuda/trunk/src/mcx_utils.c
+
+update GUI
+------------------------------------------------------------------------
+r140 | fangq | 2009-12-13 10:23:28 -0500 (Sun, 13 Dec 2009) | 1 line
+Changed paths:
+   M /mcextreme_cuda/trunk/README.txt
+   M /mcextreme_cuda/trunk/TODO.txt
+
+add README info for mcx studio
+------------------------------------------------------------------------
+r139 | fangq | 2009-12-09 16:10:53 -0500 (Wed, 09 Dec 2009) | 1 line
+Changed paths:
+   M /mcextreme_cuda/trunk/mcxstudio/mcxabout.lfm
+   M /mcextreme_cuda/trunk/mcxstudio/mcxabout.lrs
+   M /mcextreme_cuda/trunk/mcxstudio/mcxgui.lfm
+   M /mcextreme_cuda/trunk/mcxstudio/mcxgui.lrs
+   M /mcextreme_cuda/trunk/mcxstudio/mcxstudio.lpi
+   M /mcextreme_cuda/trunk/mcxstudio/mcxstudio.rc
+
+compiled on Mac OS X
+------------------------------------------------------------------------
+r138 | fangq | 2009-12-09 15:13:40 -0500 (Wed, 09 Dec 2009) | 1 line
+Changed paths:
+   M /mcextreme_cuda/trunk/mcxstudio/mcxstudio.lrs
+   M /mcextreme_cuda/trunk/src/Makefile
+   M /mcextreme_cuda/trunk/src/mcx_utils.c
+
+detect windows from Makefile
+------------------------------------------------------------------------
+r137 | fangq | 2009-12-09 14:34:01 -0500 (Wed, 09 Dec 2009) | 1 line
+Changed paths:
+   M /mcextreme_cuda/trunk/mcxstudio/mcxgui.pas
+   M /mcextreme_cuda/trunk/mcxstudio/mcxstudio.lpi
+   M /mcextreme_cuda/trunk/mcxstudio/mcxstudio.rc
+
+check mcx existance at start-up
+------------------------------------------------------------------------
+r136 | fangq | 2009-12-09 14:29:14 -0500 (Wed, 09 Dec 2009) | 1 line
+Changed paths:
+   M /mcextreme_cuda/trunk/mcxstudio/mcxgui.lfm
+   M /mcextreme_cuda/trunk/mcxstudio/mcxgui.lrs
+   M /mcextreme_cuda/trunk/mcxstudio/mcxgui.pas
+   M /mcextreme_cuda/trunk/mcxstudio/mcxstudio.lpi
+   M /mcextreme_cuda/trunk/mcxstudio/mcxstudio.lrs
+   M /mcextreme_cuda/trunk/mcxstudio/mcxstudio.rc
+   M /mcextreme_cuda/trunk/src/mcx_utils.c
+   M /mcextreme_cuda/trunk/src/mcx_utils.h
+
+add --root option
+------------------------------------------------------------------------
+r135 | fangq | 2009-12-09 13:28:08 -0500 (Wed, 09 Dec 2009) | 1 line
+Changed paths:
+   M /mcextreme_cuda/trunk/mcxstudio/mcxabout.lfm
+   M /mcextreme_cuda/trunk/mcxstudio/mcxabout.lrs
+   M /mcextreme_cuda/trunk/mcxstudio/mcxstudio.lpi
+   M /mcextreme_cuda/trunk/mcxstudio/mcxstudio.lrs
+   M /mcextreme_cuda/trunk/mcxstudio/mcxstudio.rc
+
+about form label readjusted
+------------------------------------------------------------------------
+r134 | fangq | 2009-12-09 13:23:59 -0500 (Wed, 09 Dec 2009) | 1 line
+Changed paths:
+   M /mcextreme_cuda/trunk/mcxstudio/mcxabout.lfm
+   M /mcextreme_cuda/trunk/mcxstudio/mcxabout.lrs
+   M /mcextreme_cuda/trunk/mcxstudio/mcxgui.lfm
+   M /mcextreme_cuda/trunk/mcxstudio/mcxgui.lrs
+   M /mcextreme_cuda/trunk/mcxstudio/mcxgui.pas
+   M /mcextreme_cuda/trunk/mcxstudio/mcxstudio.ico
+   M /mcextreme_cuda/trunk/mcxstudio/mcxstudio.lpi
+   M /mcextreme_cuda/trunk/mcxstudio/mcxstudio.lpr
+   M /mcextreme_cuda/trunk/mcxstudio/mcxstudio.lrs
+   M /mcextreme_cuda/trunk/mcxstudio/mcxstudio.rc
+
+bump version to 0.5, tested on windows, fix 1407 error, better search exe
+------------------------------------------------------------------------
+r133 | fangq | 2009-12-09 00:54:43 -0500 (Wed, 09 Dec 2009) | 1 line
+Changed paths:
+   M /mcextreme_cuda/trunk/mcxstudio/mcxgui.lfm
+   M /mcextreme_cuda/trunk/mcxstudio/mcxgui.lrs
+   M /mcextreme_cuda/trunk/mcxstudio/mcxgui.pas
+   M /mcextreme_cuda/trunk/mcxstudio/mcxstudio.lpi
+   M /mcextreme_cuda/trunk/mcxstudio/mcxstudio.rc
+
+undock mmOutput
+------------------------------------------------------------------------
+r132 | fangq | 2009-12-08 17:56:05 -0500 (Tue, 08 Dec 2009) | 1 line
+Changed paths:
+   M /mcextreme_cuda/trunk/src/mcx_core.cu
+
+flush output for better support with mcxstudio
+------------------------------------------------------------------------
+r131 | fangq | 2009-12-08 10:59:40 -0500 (Tue, 08 Dec 2009) | 1 line
+Changed paths:
+   M /mcextreme_cuda/trunk/mcxstudio/mcxgui.lfm
+   M /mcextreme_cuda/trunk/mcxstudio/mcxgui.lrs
+   M /mcextreme_cuda/trunk/mcxstudio/mcxgui.pas
+   M /mcextreme_cuda/trunk/mcxstudio/mcxstudio.lpi
+   M /mcextreme_cuda/trunk/mcxstudio/mcxstudio.rc
+
+GUI bug fixing
+------------------------------------------------------------------------
+r130 | fangq | 2009-12-08 02:04:34 -0500 (Tue, 08 Dec 2009) | 1 line
+Changed paths:
+   M /mcextreme_cuda/trunk/mcxstudio/mcxabout.lfm
+   M /mcextreme_cuda/trunk/mcxstudio/mcxabout.lrs
+   M /mcextreme_cuda/trunk/mcxstudio/mcxabout.pas
+   M /mcextreme_cuda/trunk/mcxstudio/mcxgui.lfm
+   M /mcextreme_cuda/trunk/mcxstudio/mcxgui.lrs
+   M /mcextreme_cuda/trunk/mcxstudio/mcxgui.pas
+   M /mcextreme_cuda/trunk/mcxstudio/mcxstudio.lpi
+   M /mcextreme_cuda/trunk/mcxstudio/mcxstudio.rc
+
+add hint, browse links, new about form, open save project files
+------------------------------------------------------------------------
+r129 | fangq | 2009-12-08 00:38:40 -0500 (Tue, 08 Dec 2009) | 1 line
+Changed paths:
+   M /mcextreme_cuda/trunk/mcxstudio/mcxabout.lfm
+   M /mcextreme_cuda/trunk/mcxstudio/mcxabout.lrs
+   M /mcextreme_cuda/trunk/mcxstudio/mcxgui.lfm
+   M /mcextreme_cuda/trunk/mcxstudio/mcxgui.lrs
+   M /mcextreme_cuda/trunk/mcxstudio/mcxgui.pas
+   M /mcextreme_cuda/trunk/mcxstudio/mcxstudio.lpi
+   M /mcextreme_cuda/trunk/mcxstudio/mcxstudio.rc
+   M /mcextreme_cuda/trunk/src/mcx_core.cu
+
+lots of changes for mcxstudio
+------------------------------------------------------------------------
+r128 | fangq | 2009-12-07 11:25:06 -0500 (Mon, 07 Dec 2009) | 1 line
+Changed paths:
+   M /mcextreme_cuda/trunk/mcxstudio/mcxabout.lfm
+   M /mcextreme_cuda/trunk/mcxstudio/mcxabout.lrs
+   M /mcextreme_cuda/trunk/mcxstudio/mcxgui.lfm
+   M /mcextreme_cuda/trunk/mcxstudio/mcxgui.lrs
+   M /mcextreme_cuda/trunk/mcxstudio/mcxgui.pas
+   M /mcextreme_cuda/trunk/mcxstudio/mcxstudio.lpi
+   M /mcextreme_cuda/trunk/mcxstudio/mcxstudio.rc
+
+GUI more options
+------------------------------------------------------------------------
+r127 | fangq | 2009-12-07 10:01:05 -0500 (Mon, 07 Dec 2009) | 1 line
+Changed paths:
+   M /mcextreme_cuda/trunk/mcxstudio/mcxgui.lfm
+   M /mcextreme_cuda/trunk/mcxstudio/mcxgui.lrs
+   M /mcextreme_cuda/trunk/mcxstudio/mcxstudio.lpi
+   M /mcextreme_cuda/trunk/mcxstudio/mcxstudio.rc
+
+debug mcxstudio with lazarus 0.9.29
+------------------------------------------------------------------------
+r126 | fangq | 2009-12-04 01:14:05 -0500 (Fri, 04 Dec 2009) | 1 line
+Changed paths:
+   M /mcextreme_cuda/trunk/mcxstudio/mcxabout.lfm
+   M /mcextreme_cuda/trunk/mcxstudio/mcxabout.lrs
+   M /mcextreme_cuda/trunk/mcxstudio/mcxabout.pas
+   M /mcextreme_cuda/trunk/mcxstudio/mcxgui.lfm
+   M /mcextreme_cuda/trunk/mcxstudio/mcxgui.lrs
+   M /mcextreme_cuda/trunk/mcxstudio/mcxgui.pas
+   M /mcextreme_cuda/trunk/mcxstudio/mcxstudio.lpi
+   M /mcextreme_cuda/trunk/mcxstudio/mcxstudio.lrs
+   M /mcextreme_cuda/trunk/mcxstudio/mcxstudio.rc
+
+GUI tool MCX Studio is almost working
+------------------------------------------------------------------------
+r125 | fangq | 2009-12-03 18:19:54 -0500 (Thu, 03 Dec 2009) | 1 line
+Changed paths:
+   A /mcextreme_cuda/trunk/example/README.txt
+
+add README file for example
+------------------------------------------------------------------------
+r124 | fangq | 2009-12-03 18:16:22 -0500 (Thu, 03 Dec 2009) | 1 line
+Changed paths:
+   M /mcextreme_cuda/trunk/example/miscount/README.txt
+   M /mcextreme_cuda/trunk/example/miscount/genreport.sh
+   M /mcextreme_cuda/trunk/example/miscount/runmiscount.sh
+
+test with miscount example
+------------------------------------------------------------------------
+r123 | fangq | 2009-12-03 18:15:41 -0500 (Thu, 03 Dec 2009) | 1 line
+Changed paths:
+   M /mcextreme_cuda/trunk/example/benchrng/Makefile
+   M /mcextreme_cuda/trunk/example/benchrng/rngspeed.cu
+
+update rngspeed example
+------------------------------------------------------------------------
+r122 | fangq | 2009-12-03 17:26:28 -0500 (Thu, 03 Dec 2009) | 1 line
+Changed paths:
+   M /mcextreme_cuda/trunk/src/Makefile
+   M /mcextreme_cuda/trunk/src/mcx_core.cu
+   M /mcextreme_cuda/trunk/src/mcx_utils.c
+
+add _atomic suffix for atomic binary
+------------------------------------------------------------------------
+r121 | fangq | 2009-12-03 17:24:11 -0500 (Thu, 03 Dec 2009) | 1 line
+Changed paths:
+   M /mcextreme_cuda/trunk/utils/cwdiffusion.m
+   M /mcextreme_cuda/trunk/utils/getdistance.m
+   M /mcextreme_cuda/trunk/utils/loadmc2.m
+   M /mcextreme_cuda/trunk/utils/serialcorr.m
+   M /mcextreme_cuda/trunk/utils/tddiffusion.m
+
+add help text for all matlab scripts
+------------------------------------------------------------------------
+r120 | fangq | 2009-12-03 16:53:57 -0500 (Thu, 03 Dec 2009) | 1 line
+Changed paths:
+   M /mcextreme_cuda/trunk/example/quicktest/run_qtest.sh
+   M /mcextreme_cuda/trunk/example/quicktest/run_qtest_silent.sh
+   M /mcextreme_cuda/trunk/example/speedtest/runspeedbench.sh
+   M /mcextreme_cuda/trunk/example/validation/run_validation.sh
+   M /mcextreme_cuda/trunk/example/validation/run_validation_b.sh
+
+update -n to -m for all example scripts
+------------------------------------------------------------------------
+r119 | fangq | 2009-12-03 16:31:22 -0500 (Thu, 03 Dec 2009) | 1 line
+Changed paths:
+   M /mcextreme_cuda/trunk/AUTHORS.txt
+   M /mcextreme_cuda/trunk/ChangeLog.txt
+   M /mcextreme_cuda/trunk/README.txt
+   M /mcextreme_cuda/trunk/src/mcx_utils.c
+
+update documentation
+------------------------------------------------------------------------
+r118 | fangq | 2009-12-03 16:08:18 -0500 (Thu, 03 Dec 2009) | 1 line
+Changed paths:
+   A /mcextreme_cuda/trunk/example/bubble/README.txt
+   A /mcextreme_cuda/trunk/example/miscount/README.txt
+   A /mcextreme_cuda/trunk/example/quicktest/README.txt
+   A /mcextreme_cuda/trunk/example/speedtest/README.txt
+   A /mcextreme_cuda/trunk/example/validation/README.txt
+
+add README files for all examples
+------------------------------------------------------------------------
+r117 | fangq | 2009-12-02 16:02:15 -0500 (Wed, 02 Dec 2009) | 1 line
+Changed paths:
+   A /mcextreme_cuda/trunk/example/bubble
+   A /mcextreme_cuda/trunk/example/bubble/bubble.inp
+   A /mcextreme_cuda/trunk/example/bubble/mcxskiptest.m
+   A /mcextreme_cuda/trunk/example/bubble/run_bubble.sh
+   M /mcextreme_cuda/trunk/src/mcx_core.cu
+
+complete bubble mode to reduce impact from non-atomic write
+------------------------------------------------------------------------
+r116 | fangq | 2009-12-02 16:00:52 -0500 (Wed, 02 Dec 2009) | 1 line
+Changed paths:
+   M /mcextreme_cuda/trunk/src/mcx_utils.c
+
+fix skipradius reading type bug
+------------------------------------------------------------------------
+r115 | fangq | 2009-12-02 13:58:32 -0500 (Wed, 02 Dec 2009) | 1 line
+Changed paths:
+   M /mcextreme_cuda/trunk/src/mcextreme.c
+   M /mcextreme_cuda/trunk/src/mcx_core.cu
+   M /mcextreme_cuda/trunk/src/mcx_utils.c
+   M /mcextreme_cuda/trunk/src/tictoc.c
+
+update citation and comment styles
+------------------------------------------------------------------------
+r114 | fangq | 2009-11-25 17:50:07 -0500 (Wed, 25 Nov 2009) | 1 line
+Changed paths:
+   A /mcextreme_cuda/trunk/src/mcx_const.h
+   M /mcextreme_cuda/trunk/src/mcx_core.cu
+
+extract constants into a unit
+------------------------------------------------------------------------
+r113 | fangq | 2009-10-29 13:50:10 -0400 (Thu, 29 Oct 2009) | 1 line
+Changed paths:
+   M /mcextreme_cuda/trunk/example/quicktest/run_qtest.sh
+   M /mcextreme_cuda/trunk/src/mcx_core.cu
+
+tested with texture but not much improvement
+------------------------------------------------------------------------
+r107 | fangq | 2009-10-24 23:52:44 -0400 (Sat, 24 Oct 2009) | 1 line
+Changed paths:
+   M /mcextreme_cuda/trunk/src/Makefile
+
+use cudaEvent, no need to link with winmm
+------------------------------------------------------------------------
+r106 | fangq | 2009-10-24 23:49:32 -0400 (Sat, 24 Oct 2009) | 1 line
+Changed paths:
+   M /mcextreme_cuda/trunk/ChangeLog.txt
+   M /mcextreme_cuda/trunk/example/quicktest/qtest.inp
+   M /mcextreme_cuda/trunk/example/quicktest/run_qtest.sh
+   M /mcextreme_cuda/trunk/src/Makefile
+   A /mcextreme_cuda/trunk/src/mcextreme.c (from /mcextreme_cuda/trunk/src/mcextreme.cu:105)
+   D /mcextreme_cuda/trunk/src/mcextreme.cu
+   M /mcextreme_cuda/trunk/src/mcx_core.cu
+   M /mcextreme_cuda/trunk/src/tictoc.c
+   M /mcextreme_cuda/trunk/src/tictoc.h
+
+use cuda event timer, use VC compiler for Windows
+------------------------------------------------------------------------
+r105 | fangq | 2009-10-23 13:39:32 -0400 (Fri, 23 Oct 2009) | 1 line
+Changed paths:
+   M /mcextreme_cuda/trunk/ChangeLog.txt
+   M /mcextreme_cuda/trunk/doc/gendoc.sh
+   M /mcextreme_cuda/trunk/src/Makefile
+   M /mcextreme_cuda/trunk/src/mcextreme.cu
+   M /mcextreme_cuda/trunk/src/mcx_core.cu
+   A /mcextreme_cuda/trunk/src/mcx_core.h
+
+renaming mcextreme.cu to .c failed MinGW g++, keep .cu
+------------------------------------------------------------------------
+r104 | fangq | 2009-10-22 00:49:08 -0400 (Thu, 22 Oct 2009) | 1 line
+Changed paths:
+   M /mcextreme_cuda/trunk/README.txt
+   M /mcextreme_cuda/trunk/doc/Download.txt
+   M /mcextreme_cuda/trunk/doc/INSTALL.txt
+
+update citation and compiling instructions
+------------------------------------------------------------------------
+r103 | fangq | 2009-10-21 22:38:15 -0400 (Wed, 21 Oct 2009) | 1 line
+Changed paths:
+   M /mcextreme_cuda/trunk/TODO.txt
+   M /mcextreme_cuda/trunk/src/mcextreme.cu
+   M /mcextreme_cuda/trunk/src/mcx_core.cu
+
+polishing message printing and update TODO
+------------------------------------------------------------------------
+r102 | fangq | 2009-10-21 14:45:48 -0400 (Wed, 21 Oct 2009) | 1 line
+Changed paths:
+   M /mcextreme_cuda/trunk/src/Makefile
+   M /mcextreme_cuda/trunk/src/br2cu.h
+   M /mcextreme_cuda/trunk/src/mcx_utils.h
+   A /mcextreme_cuda/trunk/src/tictoc.c
+   M /mcextreme_cuda/trunk/src/tictoc.h
+
+preliminary windows support via MinGW+VS+CUDA
+------------------------------------------------------------------------
+r101 | fangq | 2009-10-20 19:38:13 -0400 (Tue, 20 Oct 2009) | 1 line
+Changed paths:
+   A /mcextreme_cuda/trunk/AUTHORS.txt
+
+add AUTHORS.txt
+------------------------------------------------------------------------
+r99 | fangq | 2009-10-20 19:32:44 -0400 (Tue, 20 Oct 2009) | 1 line
+Changed paths:
+   A /mcextreme_cuda/trunk/doc/Download.txt
+   A /mcextreme_cuda/trunk/doc/FAQ.txt
+   A /mcextreme_cuda/trunk/doc/Get_Started.txt
+   A /mcextreme_cuda/trunk/doc/INSTALL.txt
+   A /mcextreme_cuda/trunk/doc/gendoc.sh
+   A /mcextreme_cuda/trunk/doc/mcx_workflow.png
+
+add documents and wiki download script
+------------------------------------------------------------------------
+r98 | fangq | 2009-10-20 18:18:41 -0400 (Tue, 20 Oct 2009) | 1 line
+Changed paths:
+   M /mcextreme_cuda/trunk/README.txt
+   M /mcextreme_cuda/trunk/example/quicktest/run_qtest_silent.sh
+
+polish for releasing 0.2 beta
+------------------------------------------------------------------------
+r97 | fangq | 2009-10-20 14:10:59 -0400 (Tue, 20 Oct 2009) | 1 line
+Changed paths:
+   M /mcextreme_cuda/trunk/example/validation/plotsimudata.m
+
+add auto detection for loading utils path
+------------------------------------------------------------------------
+r96 | fangq | 2009-10-20 13:05:00 -0400 (Tue, 20 Oct 2009) | 1 line
+Changed paths:
+   M /mcextreme_cuda/trunk/ChangeLog.txt
+   M /mcextreme_cuda/trunk/LICENSE.txt
+   M /mcextreme_cuda/trunk/README.txt
+   M /mcextreme_cuda/trunk/mcxstudio/mcxgui.pas
+   M /mcextreme_cuda/trunk/src/mcextreme.cu
+
+set license to GPLv3
+------------------------------------------------------------------------
+r95 | fangq | 2009-10-19 16:39:13 -0400 (Mon, 19 Oct 2009) | 1 line
+Changed paths:
+   M /mcextreme_cuda/trunk/src/Makefile
+   M /mcextreme_cuda/trunk/src/logistic_rand.cu
+
+remove double precision warning for CUDA 2.3
+------------------------------------------------------------------------
+r94 | fangq | 2009-10-06 15:15:31 -0400 (Tue, 06 Oct 2009) | 1 line
+Changed paths:
+   M /mcextreme_cuda/trunk/TODO.txt
+   M /mcextreme_cuda/trunk/mcxstudio/mcxabout.lrs
+   M /mcextreme_cuda/trunk/mcxstudio/mcxgui.lfm
+   M /mcextreme_cuda/trunk/mcxstudio/mcxgui.lrs
+   M /mcextreme_cuda/trunk/mcxstudio/mcxgui.pas
+   M /mcextreme_cuda/trunk/mcxstudio/mcxstudio.lpi
+   M /mcextreme_cuda/trunk/mcxstudio/mcxstudio.rc
+
+GUI development
+------------------------------------------------------------------------
+r93 | fangq | 2009-09-30 18:49:35 -0400 (Wed, 30 Sep 2009) | 1 line
+Changed paths:
+   M /mcextreme_cuda/trunk/mcxstudio/mcxabout.pas
+   M /mcextreme_cuda/trunk/mcxstudio/mcxgui.lrs
+   M /mcextreme_cuda/trunk/mcxstudio/mcxgui.pas
+   M /mcextreme_cuda/trunk/mcxstudio/mcxstudio.lpi
+   M /mcextreme_cuda/trunk/mcxstudio/mcxstudio.rc
+
+mcx studio remove hashlist
+------------------------------------------------------------------------
+r92 | fangq | 2009-09-30 15:01:07 -0400 (Wed, 30 Sep 2009) | 1 line
+Changed paths:
+   D /mcextreme_cuda/trunk/ForReviewers.txt
+   M /mcextreme_cuda/trunk/README.txt
+   M /mcextreme_cuda/trunk/TODO.txt
+   M /mcextreme_cuda/trunk/src/Makefile
+   M /mcextreme_cuda/trunk/src/logistic_rand.cu
+   M /mcextreme_cuda/trunk/src/mcx_core.cu
+   M /mcextreme_cuda/trunk/src/mcx_utils.c
+   M /mcextreme_cuda/trunk/src/mt_rand_s.cu
+
+update documents and check nvcc in the Makefile
+------------------------------------------------------------------------
+r91 | fangq | 2009-09-30 11:54:53 -0400 (Wed, 30 Sep 2009) | 1 line
+Changed paths:
+   M /mcextreme_cuda/trunk/example/speedtest/genreport.sh
+   M /mcextreme_cuda/trunk/example/validation/run_validation.sh
+   M /mcextreme_cuda/trunk/example/validation/run_validation_b.sh
+   M /mcextreme_cuda/trunk/src/Makefile
+
+correct executable name to mcx
+------------------------------------------------------------------------
+r90 | fangq | 2009-09-25 13:12:10 -0400 (Fri, 25 Sep 2009) | 1 line
+Changed paths:
+   M /mcextreme_cuda/trunk/example/miscount/runmiscount.sh
+   M /mcextreme_cuda/trunk/example/quicktest/listgpu.sh
+   M /mcextreme_cuda/trunk/example/quicktest/run_qtest.sh
+   M /mcextreme_cuda/trunk/example/speedtest/runspeedbench.sh
+   M /mcextreme_cuda/trunk/src/Makefile
+
+change executable name from mcextreme to mcx
+------------------------------------------------------------------------
+r89 | fangq | 2009-09-25 12:57:12 -0400 (Fri, 25 Sep 2009) | 1 line
+Changed paths:
+   M /mcextreme_cuda/trunk/README.txt
+   M /mcextreme_cuda/trunk/TODO.txt
+   M /mcextreme_cuda/trunk/src/mcx_core.cu
+   M /mcextreme_cuda/trunk/src/mcx_utils.c
+   M /mcextreme_cuda/trunk/src/mcx_utils.h
+
+support verbose options
+------------------------------------------------------------------------
+r88 | fangq | 2009-09-25 01:08:33 -0400 (Fri, 25 Sep 2009) | 1 line
+Changed paths:
+   M /mcextreme_cuda/trunk/src/Makefile
+   M /mcextreme_cuda/trunk/src/mcx_core.cu
+
+fix memory leak detected by valgrind (cuda may have leak too)
+------------------------------------------------------------------------
+r87 | fangq | 2009-09-24 19:02:02 -0400 (Thu, 24 Sep 2009) | 1 line
+Changed paths:
+   M /mcextreme_cuda/trunk/example/speedtest/runspeedbench.sh
+   M /mcextreme_cuda/trunk/src/Makefile
+   M /mcextreme_cuda/trunk/src/logistic_rand.cu
+   M /mcextreme_cuda/trunk/src/mcextreme.cu
+   M /mcextreme_cuda/trunk/src/mcx_core.cu
+   M /mcextreme_cuda/trunk/src/mt_rand_s.cu
+
+major code cleanup,unified rand interface,GPUDEBUG macro
+------------------------------------------------------------------------
+r86 | fangq | 2009-09-24 15:55:37 -0400 (Thu, 24 Sep 2009) | 1 line
+Changed paths:
+   M /mcextreme_cuda/trunk/src/Makefile
+
+use nvcc option to activate fast math instead of macros
+------------------------------------------------------------------------
+r85 | fangq | 2009-09-14 12:05:18 -0400 (Mon, 14 Sep 2009) | 1 line
+Changed paths:
+   M /mcextreme_cuda/trunk/example/quicktest/run_qtest.sh
+   M /mcextreme_cuda/trunk/src/mcx_core.cu
+   M /mcextreme_cuda/trunk/src/mcx_utils.c
+   M /mcextreme_cuda/trunk/src/mcx_utils.h
+
+add -R option to avoid accumulation near the source for non-atomic
+------------------------------------------------------------------------
+r84 | fangq | 2009-08-08 13:37:48 -0400 (Sat, 08 Aug 2009) | 1 line
+Changed paths:
+   M /mcextreme_cuda/trunk/ForReviewers.txt
+
+typo correction
+------------------------------------------------------------------------
+r83 | fangq | 2009-07-31 15:51:51 -0400 (Fri, 31 Jul 2009) | 1 line
+Changed paths:
+   M /mcextreme_cuda/trunk/src/Makefile
+   M /mcextreme_cuda/trunk/src/mcx_core.cu
+
+compile on GTX295 with CUDA 2.3
+------------------------------------------------------------------------
+r82 | fangq | 2009-07-20 20:23:52 -0400 (Mon, 20 Jul 2009) | 1 line
+Changed paths:
+   M /mcextreme_cuda/trunk/ForReviewers.txt
+
+more comments for reviewers
+------------------------------------------------------------------------
+r81 | fangq | 2009-07-15 11:01:46 -0400 (Wed, 15 Jul 2009) | 1 line
+Changed paths:
+   M /mcextreme_cuda/trunk/ForReviewers.txt
+
+update ForReviewers.txt
+------------------------------------------------------------------------
+r80 | fangq | 2009-07-15 10:56:13 -0400 (Wed, 15 Jul 2009) | 1 line
+Changed paths:
+   A /mcextreme_cuda/trunk/ForReviewers.txt
+
+add comments for reviewers
+------------------------------------------------------------------------
+r79 | fangq | 2009-07-15 10:39:05 -0400 (Wed, 15 Jul 2009) | 1 line
+Changed paths:
+   M /mcextreme_cuda/trunk/src/Makefile
+   M /mcextreme_cuda/trunk/src/mcx_core.cu
+
+use atomicFloatAdd again, tested and working
+------------------------------------------------------------------------
+r78 | fangq | 2009-07-14 19:38:59 -0400 (Tue, 14 Jul 2009) | 1 line
+Changed paths:
+   M /mcextreme_cuda/trunk/src/Makefile
+   M /mcextreme_cuda/trunk/src/mcx_core.cu
+
+atomicExch and struct to use constant mem
+------------------------------------------------------------------------
+r77 | fangq | 2009-07-13 14:08:10 -0400 (Mon, 13 Jul 2009) | 1 line
+Changed paths:
+   A /mcextreme_cuda/trunk/src/logistic_rand_ring3.cu
+   M /mcextreme_cuda/trunk/src/mcx_core.cu
+   M /mcextreme_cuda/trunk/src/mcx_utils.c
+   M /mcextreme_cuda/trunk/src/mcx_utils.h
+
+some comments about register usage
+------------------------------------------------------------------------
+r76 | fangq | 2009-07-13 12:04:22 -0400 (Mon, 13 Jul 2009) | 1 line
+Changed paths:
+   M /mcextreme_cuda/trunk/example/validation/plotsimudata.m
+   M /mcextreme_cuda/trunk/example/validation/run_validation_b.sh
+
+half-grid shift in validation example
+------------------------------------------------------------------------
+r75 | fangq | 2009-07-10 02:09:44 -0400 (Fri, 10 Jul 2009) | 1 line
+Changed paths:
+   M /mcextreme_cuda/trunk/example/quicktest/run_qtest.sh
+   M /mcextreme_cuda/trunk/example/speedtest/runspeedbench.sh
+   M /mcextreme_cuda/trunk/example/validation/run_validation.sh
+   M /mcextreme_cuda/trunk/example/validation/run_validation_b.sh
+   M /mcextreme_cuda/trunk/src/Makefile
+   M /mcextreme_cuda/trunk/src/mcx_core.cu
+
+while-loop makes code unstable, retract to photon moves
+------------------------------------------------------------------------
+r74 | fangq | 2009-07-09 18:01:39 -0400 (Thu, 09 Jul 2009) | 1 line
+Changed paths:
+   M /mcextreme_cuda/trunk/example/miscount/miscnt.template
+   M /mcextreme_cuda/trunk/example/miscount/runmiscount.sh
+   M /mcextreme_cuda/trunk/example/quicktest/run_qtest.sh
+   M /mcextreme_cuda/trunk/example/speedtest/runspeedbench.sh
+   M /mcextreme_cuda/trunk/example/validation/plotsimudata.m
+   M /mcextreme_cuda/trunk/example/validation/run_validation.sh
+   M /mcextreme_cuda/trunk/example/validation/run_validation_b.sh
+
+update examples to use -n input
+------------------------------------------------------------------------
+r73 | fangq | 2009-07-09 17:46:06 -0400 (Thu, 09 Jul 2009) | 1 line
+Changed paths:
+   M /mcextreme_cuda/trunk/src/Makefile
+   M /mcextreme_cuda/trunk/src/mcx_core.cu
+
+move mcx_cu_assess location to avoid asynchronous call
+------------------------------------------------------------------------
+r72 | fangq | 2009-07-08 01:45:40 -0400 (Wed, 08 Jul 2009) | 1 line
+Changed paths:
+   M /mcextreme_cuda/trunk/src/mcx_core.cu
+   M /mcextreme_cuda/trunk/src/mcx_utils.c
+   M /mcextreme_cuda/trunk/src/mcx_utils.h
+
+1. reflection case 3 interface, 2. set total photon num
+------------------------------------------------------------------------
+r71 | fangq | 2009-07-06 13:33:20 -0400 (Mon, 06 Jul 2009) | 1 line
+Changed paths:
+   A /mcextreme_cuda/trunk/example/validation/plotsimudata.m
+
+add script to produce Fig 4
+------------------------------------------------------------------------
+r70 | fangq | 2009-06-26 19:34:04 -0400 (Fri, 26 Jun 2009) | 1 line
+Changed paths:
+   D /mcextreme_cuda/trunk/example/miscount/benchmiscnt.inp
+
+no need to include benchmiscnt.inp
+------------------------------------------------------------------------
+r69 | fangq | 2009-06-26 19:32:55 -0400 (Fri, 26 Jun 2009) | 1 line
+Changed paths:
+   A /mcextreme_cuda/trunk/example/miscount
+   A /mcextreme_cuda/trunk/example/miscount/benchmiscnt.inp
+   A /mcextreme_cuda/trunk/example/miscount/genreport.sh
+   A /mcextreme_cuda/trunk/example/miscount/miscnt.template
+   A /mcextreme_cuda/trunk/example/miscount/runmiscount.sh
+   M /mcextreme_cuda/trunk/src/Makefile
+   M /mcextreme_cuda/trunk/src/mcx_core.cu
+
+code and examples to test global memory write racing
+------------------------------------------------------------------------
+r68 | fangq | 2009-05-21 02:05:05 -0400 (Thu, 21 May 2009) | 1 line
+Changed paths:
+   A /mcextreme_cuda/trunk/mcxstudio/mcxconfig.pas
+
+config unit
+------------------------------------------------------------------------
+r67 | fangq | 2009-05-21 02:04:38 -0400 (Thu, 21 May 2009) | 1 line
+Changed paths:
+   M /mcextreme_cuda/trunk/mcxstudio/mcxabout.lfm
+   M /mcextreme_cuda/trunk/mcxstudio/mcxabout.lrs
+   M /mcextreme_cuda/trunk/mcxstudio/mcxabout.pas
+   M /mcextreme_cuda/trunk/mcxstudio/mcxgui.lfm
+   M /mcextreme_cuda/trunk/mcxstudio/mcxgui.lrs
+   M /mcextreme_cuda/trunk/mcxstudio/mcxgui.pas
+   M /mcextreme_cuda/trunk/mcxstudio/mcxstudio.lpi
+
+action list
+------------------------------------------------------------------------
+r66 | fangq | 2009-05-20 17:35:16 -0400 (Wed, 20 May 2009) | 1 line
+Changed paths:
+   M /mcextreme_cuda/trunk/mcxstudio/mcxabout.lfm
+   M /mcextreme_cuda/trunk/mcxstudio/mcxabout.lrs
+   M /mcextreme_cuda/trunk/mcxstudio/mcxgui.lfm
+   M /mcextreme_cuda/trunk/mcxstudio/mcxgui.lrs
+   M /mcextreme_cuda/trunk/mcxstudio/mcxgui.pas
+   M /mcextreme_cuda/trunk/mcxstudio/mcxstudio.lpi
+   M /mcextreme_cuda/trunk/mcxstudio/mcxstudio.rc
+
+add icons
+------------------------------------------------------------------------
+r65 | fangq | 2009-05-19 14:46:13 -0400 (Tue, 19 May 2009) | 1 line
+Changed paths:
+   A /mcextreme_cuda/trunk/mcxstudio
+   A /mcextreme_cuda/trunk/mcxstudio/debug
+   A /mcextreme_cuda/trunk/mcxstudio/mcxabout.lfm
+   A /mcextreme_cuda/trunk/mcxstudio/mcxabout.lrs
+   A /mcextreme_cuda/trunk/mcxstudio/mcxabout.pas
+   A /mcextreme_cuda/trunk/mcxstudio/mcxgui.lfm
+   A /mcextreme_cuda/trunk/mcxstudio/mcxgui.lrs
+   A /mcextreme_cuda/trunk/mcxstudio/mcxgui.pas
+   A /mcextreme_cuda/trunk/mcxstudio/mcxstudio.ico
+   A /mcextreme_cuda/trunk/mcxstudio/mcxstudio.lpi
+   A /mcextreme_cuda/trunk/mcxstudio/mcxstudio.lpr
+   A /mcextreme_cuda/trunk/mcxstudio/mcxstudio.lrs
+   A /mcextreme_cuda/trunk/mcxstudio/mcxstudio.manifest
+   A /mcextreme_cuda/trunk/mcxstudio/mcxstudio.rc
+
+add mcx studio: a gui for mcx
+------------------------------------------------------------------------
+r64 | fangq | 2009-05-07 00:12:51 -0400 (Thu, 07 May 2009) | 1 line
+Changed paths:
+   M /mcextreme_cuda/trunk/src/mcextreme.cu
+
+quit if no gpu found
+------------------------------------------------------------------------
+r63 | fangq | 2009-05-07 00:11:49 -0400 (Thu, 07 May 2009) | 1 line
+Changed paths:
+   M /mcextreme_cuda/trunk/src/mcextreme.cu
+   M /mcextreme_cuda/trunk/src/mcx_core.cu
+   M /mcextreme_cuda/trunk/src/mcx_utils.c
+   M /mcextreme_cuda/trunk/src/mcx_utils.h
+
+-L option to list GPU info
+------------------------------------------------------------------------
+r62 | fangq | 2009-05-07 00:10:44 -0400 (Thu, 07 May 2009) | 1 line
+Changed paths:
+   A /mcextreme_cuda/trunk/example/quicktest
+   A /mcextreme_cuda/trunk/example/quicktest/listgpu.sh
+   A /mcextreme_cuda/trunk/example/quicktest/qtest.inp
+   A /mcextreme_cuda/trunk/example/quicktest/run_qtest.sh
+   A /mcextreme_cuda/trunk/example/quicktest/run_qtest_silent.sh
+
+quicktest example
+------------------------------------------------------------------------
+r61 | fangq | 2009-05-05 14:38:22 -0400 (Tue, 05 May 2009) | 1 line
+Changed paths:
+   M /mcextreme_cuda/trunk/ChangeLog.txt
+
+added -l option to dump messages to a log file
+------------------------------------------------------------------------
+r60 | fangq | 2009-05-05 14:37:43 -0400 (Tue, 05 May 2009) | 1 line
+Changed paths:
+   M /mcextreme_cuda/trunk/ChangeLog.txt
+   M /mcextreme_cuda/trunk/src/mcx_core.cu
+   M /mcextreme_cuda/trunk/src/mcx_utils.c
+   M /mcextreme_cuda/trunk/src/mcx_utils.h
+
+added -l option to dump messages to a log file
+------------------------------------------------------------------------
+r57 | fangq | 2009-05-01 21:59:01 -0400 (Fri, 01 May 2009) | 1 line
+Changed paths:
+   M /mcextreme_cuda/trunk/ChangeLog.txt
+
+reverse time order for ChangeLog
+------------------------------------------------------------------------
+r56 | fangq | 2009-05-01 16:44:15 -0400 (Fri, 01 May 2009) | 1 line
+Changed paths:
+   M /mcextreme_cuda/trunk/src/mcx_utils.c
+
+automatically fix source position if it is outside the domain
+------------------------------------------------------------------------
+r55 | fangq | 2009-05-01 13:39:45 -0400 (Fri, 01 May 2009) | 1 line
+Changed paths:
+   M /mcextreme_cuda/trunk/src/mcx_core.cu
+
+fix an nan bug for direction vector
+------------------------------------------------------------------------
+r54 | fangq | 2009-04-30 16:34:59 -0400 (Thu, 30 Apr 2009) | 1 line
+Changed paths:
+   M /mcextreme_cuda/trunk/ChangeLog.txt
+   M /mcextreme_cuda/trunk/README.txt
+   M /mcextreme_cuda/trunk/TODO.txt
+
+update documents
+------------------------------------------------------------------------
+r53 | fangq | 2009-04-30 13:41:01 -0400 (Thu, 30 Apr 2009) | 1 line
+Changed paths:
+   M /mcextreme_cuda/trunk/example/validation/run_validation.sh
+   M /mcextreme_cuda/trunk/example/validation/run_validation_b.sh
+   M /mcextreme_cuda/trunk/src/Makefile
+   M /mcextreme_cuda/trunk/src/mcx_utils.c
+   M /mcextreme_cuda/trunk/src/mcx_utils.h
+
+set isnormalized=1 by default
+------------------------------------------------------------------------
+r52 | fangq | 2009-04-30 02:42:56 -0400 (Thu, 30 Apr 2009) | 1 line
+Changed paths:
+   M /mcextreme_cuda/trunk/src/Makefile
+   M /mcextreme_cuda/trunk/src/mcx_core.cu
+   M /mcextreme_cuda/trunk/src/mcx_utils.c
+   M /mcextreme_cuda/trunk/src/mcx_utils.h
+   M /mcextreme_cuda/trunk/utils/cwdiffusion.m
+   A /mcextreme_cuda/trunk/utils/loadmc2.m
+   M /mcextreme_cuda/trunk/utils/normalizemcx.m
+   M /mcextreme_cuda/trunk/utils/tddiffusion.m
+
+paper finalization
+------------------------------------------------------------------------
+r51 | fangq | 2009-04-29 01:20:40 -0400 (Wed, 29 Apr 2009) | 1 line
+Changed paths:
+   M /mcextreme_cuda/trunk/example/validation/run_validation.sh
+   A /mcextreme_cuda/trunk/example/validation/run_validation_b.sh
+   A /mcextreme_cuda/trunk/example/validation/validation_b.inp
+   A /mcextreme_cuda/trunk/example/validation/validation_dark_b.inp
+
+boundary reflection tests
+------------------------------------------------------------------------
+r50 | fangq | 2009-04-27 18:36:09 -0400 (Mon, 27 Apr 2009) | 1 line
+Changed paths:
+   A /mcextreme_cuda/trunk/example/speedtest/genreport.sh
+
+tool to extract the key numbers
+------------------------------------------------------------------------
+r49 | fangq | 2009-04-27 18:13:05 -0400 (Mon, 27 Apr 2009) | 1 line
+Changed paths:
+   A /mcextreme_cuda/trunk/example/speedtest
+   A /mcextreme_cuda/trunk/example/speedtest/benchcpeed.inp
+   A /mcextreme_cuda/trunk/example/speedtest/runspeedbench.sh
+
+speed benchmark
+------------------------------------------------------------------------
+r48 | fangq | 2009-04-27 13:54:18 -0400 (Mon, 27 Apr 2009) | 1 line
+Changed paths:
+   M /mcextreme_cuda/trunk/example/validation/run_validation.sh
+
+change simulation param
+------------------------------------------------------------------------
+r47 | fangq | 2009-04-27 13:46:03 -0400 (Mon, 27 Apr 2009) | 1 line
+Changed paths:
+   M /mcextreme_cuda/trunk/src/mcx_core.cu
+
+compare validations for two RNGs
+------------------------------------------------------------------------
+r46 | fangq | 2009-04-26 19:24:37 -0400 (Sun, 26 Apr 2009) | 1 line
+Changed paths:
+   M /mcextreme_cuda/trunk/src/mcx_core.cu
+   M /mcextreme_cuda/trunk/src/mcx_utils.c
+   M /mcextreme_cuda/trunk/src/mcx_utils.h
+
+code polish
+------------------------------------------------------------------------
+r45 | fangq | 2009-04-25 21:53:53 -0400 (Sat, 25 Apr 2009) | 1 line
+Changed paths:
+   M /mcextreme_cuda/trunk/src/mcx_core.cu
+
+boundary reflection fix
+------------------------------------------------------------------------
+r44 | fangq | 2009-04-24 19:48:38 -0400 (Fri, 24 Apr 2009) | 1 line
+Changed paths:
+   A /mcextreme_cuda/trunk/example/validation
+   A /mcextreme_cuda/trunk/example/validation/run_validation.sh
+   A /mcextreme_cuda/trunk/example/validation/semi60x60x60.bin
+   A /mcextreme_cuda/trunk/example/validation/validation.inp
+   A /mcextreme_cuda/trunk/example/validation/validation_dark.inp
+
+add validation example
+------------------------------------------------------------------------
+r43 | fangq | 2009-04-24 19:46:44 -0400 (Fri, 24 Apr 2009) | 1 line
+Changed paths:
+   M /mcextreme_cuda/trunk/utils/tddiffusion.m
+
+minor update
+------------------------------------------------------------------------
+r42 | fangq | 2009-04-24 19:45:36 -0400 (Fri, 24 Apr 2009) | 1 line
+Changed paths:
+   M /mcextreme_cuda/trunk/src/mcx_core.cu
+   M /mcextreme_cuda/trunk/src/mcx_utils.c
+   M /mcextreme_cuda/trunk/src/mcx_utils.h
+
+build-in data normalization (CPU)
+------------------------------------------------------------------------
+r41 | fangq | 2009-04-24 13:48:22 -0400 (Fri, 24 Apr 2009) | 1 line
+Changed paths:
+   A /mcextreme_cuda/trunk/utils/cwdiffusion.m
+   A /mcextreme_cuda/trunk/utils/getdistance.m
+   A /mcextreme_cuda/trunk/utils/normalizemcx.m
+   A /mcextreme_cuda/trunk/utils/tddiffusion.m
+
+add scripts for validation
+------------------------------------------------------------------------
+r40 | fangq | 2009-04-24 12:26:01 -0400 (Fri, 24 Apr 2009) | 1 line
+Changed paths:
+   M /mcextreme_cuda/trunk/src/mcx_core.cu
+
+oops, missing double quote
+------------------------------------------------------------------------
+r39 | fangq | 2009-04-24 12:24:13 -0400 (Fri, 24 Apr 2009) | 1 line
+Changed paths:
+   M /mcextreme_cuda/trunk/src/mcx_core.cu
+
+fix a bug for scattering angle, validation passed
+------------------------------------------------------------------------
+r38 | fangq | 2009-04-22 11:47:20 -0400 (Wed, 22 Apr 2009) | 1 line
+Changed paths:
+   M /mcextreme_cuda/trunk/src/mcx_core.cu
+   M /mcextreme_cuda/trunk/src/mcx_utils.c
+
+comment update
+------------------------------------------------------------------------
+r37 | fangq | 2009-04-20 16:53:51 -0400 (Mon, 20 Apr 2009) | 1 line
+Changed paths:
+   D /mcextreme_cuda/trunk/example/benchrng/serialcorr.m
+   A /mcextreme_cuda/trunk/utils/serialcorr.m (from /mcextreme_cuda/trunk/example/benchrng/serialcorr.m:31)
+
+add utility directory for all m-files
+------------------------------------------------------------------------
+r36 | fangq | 2009-04-20 16:53:02 -0400 (Mon, 20 Apr 2009) | 1 line
+Changed paths:
+   A /mcextreme_cuda/trunk/utils
+
+add utility directory for all m-files
+------------------------------------------------------------------------
+r35 | fangq | 2009-04-20 14:33:17 -0400 (Mon, 20 Apr 2009) | 1 line
+Changed paths:
+   M /mcextreme_cuda/trunk/src/mcx_core.cu
+   M /mcextreme_cuda/trunk/src/mcx_utils.c
+   M /mcextreme_cuda/trunk/src/mcx_utils.h
+
+support multiple repetitions within one executation
+------------------------------------------------------------------------
+r34 | fangq | 2009-04-19 11:14:06 -0400 (Sun, 19 Apr 2009) | 1 line
+Changed paths:
+   M /mcextreme_cuda/trunk/src/mcx_core.cu
+
+fix nan bug at ran=1
+------------------------------------------------------------------------
+r33 | fangq | 2009-04-18 12:05:19 -0400 (Sat, 18 Apr 2009) | 1 line
+Changed paths:
+   M /mcextreme_cuda/trunk/src/mcx_core.cu
+
+fix media read out-of-bound bug
+------------------------------------------------------------------------
+r32 | fangq | 2009-04-17 16:27:45 -0400 (Fri, 17 Apr 2009) | 1 line
+Changed paths:
+   M /mcextreme_cuda/trunk/src/logistic_rand.cu
+   M /mcextreme_cuda/trunk/src/mcx_utils.c
+   M /mcextreme_cuda/trunk/src/mcx_utils.h
+
+config field for saving the detector photon history
+------------------------------------------------------------------------
+r31 | fangq | 2009-04-17 14:02:38 -0400 (Fri, 17 Apr 2009) | 1 line
+Changed paths:
+   A /mcextreme_cuda/trunk/example/benchrng
+   A /mcextreme_cuda/trunk/example/benchrng/Makefile
+   A /mcextreme_cuda/trunk/example/benchrng/rngspeed.cu
+   A /mcextreme_cuda/trunk/example/benchrng/runbench.sh
+   A /mcextreme_cuda/trunk/example/benchrng/serialcorr.m
+
+add benchmarks for RNG speed and correlation tests
+------------------------------------------------------------------------
+r30 | fangq | 2009-04-07 17:16:48 -0400 (Tue, 07 Apr 2009) | 1 line
+Changed paths:
+   M /mcextreme_cuda/trunk/ChangeLog.txt
+   M /mcextreme_cuda/trunk/src/mcextreme.cu
+
+comment updates
+------------------------------------------------------------------------
+r29 | fangq | 2009-04-07 17:09:42 -0400 (Tue, 07 Apr 2009) | 1 line
+Changed paths:
+   A /mcextreme_cuda/trunk/TODO.txt (from /mcextreme_cuda/trunk/src/TODO.txt:28)
+   D /mcextreme_cuda/trunk/src/TODO.txt
+
+move todo list path
+------------------------------------------------------------------------
+r28 | fangq | 2009-04-07 17:09:18 -0400 (Tue, 07 Apr 2009) | 1 line
+Changed paths:
+   A /mcextreme_cuda/trunk/src/TODO.txt
+
+add todo list
+------------------------------------------------------------------------
+r27 | fangq | 2009-04-07 17:04:31 -0400 (Tue, 07 Apr 2009) | 1 line
+Changed paths:
+   M /mcextreme_cuda/trunk/src/mcx_core.cu
+   M /mcextreme_cuda/trunk/src/mcx_utils.c
+   M /mcextreme_cuda/trunk/src/mcx_utils.h
+
+energy conservation for scaling solutions
+------------------------------------------------------------------------
+r26 | fangq | 2009-04-06 16:02:21 -0400 (Mon, 06 Apr 2009) | 1 line
+Changed paths:
+   M /mcextreme_cuda/trunk/src/mcx_core.cu
+   M /mcextreme_cuda/trunk/src/mcx_utils.c
+   M /mcextreme_cuda/trunk/src/mcx_utils.h
+
+reflection flag, debug messages and time-integral
+------------------------------------------------------------------------
+r25 | fangq | 2009-04-03 19:44:10 -0400 (Fri, 03 Apr 2009) | 1 line
+Changed paths:
+   M /mcextreme_cuda/trunk/src/Makefile
+   M /mcextreme_cuda/trunk/src/mcx_core.cu
+   M /mcextreme_cuda/trunk/src/mcx_utils.c
+
+misc updates
+------------------------------------------------------------------------
+r24 | fangq | 2009-04-03 16:04:41 -0400 (Fri, 03 Apr 2009) | 1 line
+Changed paths:
+   M /mcextreme_cuda/trunk/src/mcextreme.cu
+   M /mcextreme_cuda/trunk/src/mcx_core.cu
+   M /mcextreme_cuda/trunk/src/mcx_utils.c
+   M /mcextreme_cuda/trunk/src/mcx_utils.h
+
+polish time gating implementation
+------------------------------------------------------------------------
+r23 | fangq | 2009-04-03 12:51:28 -0400 (Fri, 03 Apr 2009) | 1 line
+Changed paths:
+   M /mcextreme_cuda/trunk/src/mcx_core.cu
+   M /mcextreme_cuda/trunk/src/mcx_utils.c
+   M /mcextreme_cuda/trunk/src/mcx_utils.h
+
+time gating support
+------------------------------------------------------------------------
+r22 | fangq | 2009-04-02 17:28:40 -0400 (Thu, 02 Apr 2009) | 1 line
+Changed paths:
+   M /mcextreme_cuda/trunk/src/mcx_core.cu
+   M /mcextreme_cuda/trunk/src/mcx_utils.c
+   M /mcextreme_cuda/trunk/src/mcx_utils.h
+
+support row-major and column-major input
+------------------------------------------------------------------------
+r21 | fangq | 2009-04-02 16:41:56 -0400 (Thu, 02 Apr 2009) | 1 line
+Changed paths:
+   M /mcextreme_cuda/trunk/src/mcx_core.cu
+   M /mcextreme_cuda/trunk/src/mcx_utils.c
+   M /mcextreme_cuda/trunk/src/mcx_utils.h
+
+bug fixes, echo inputs and tested with sample input
+------------------------------------------------------------------------
+r20 | fangq | 2009-04-02 14:38:26 -0400 (Thu, 02 Apr 2009) | 1 line
+Changed paths:
+   M /mcextreme_cuda/trunk/src/mcx_utils.c
+   M /mcextreme_cuda/trunk/src/mcx_utils.h
+
+session id string
+------------------------------------------------------------------------
+r19 | fangq | 2009-04-02 14:32:39 -0400 (Thu, 02 Apr 2009) | 1 line
+Changed paths:
+   M /mcextreme_cuda/trunk/src/Makefile
+   M /mcextreme_cuda/trunk/src/mcextreme.cu
+   A /mcextreme_cuda/trunk/src/mcx_core.cu
+   A /mcextreme_cuda/trunk/src/mcx_utils.c
+   A /mcextreme_cuda/trunk/src/mcx_utils.h
+
+split the code into multiple units, read/write config files
+------------------------------------------------------------------------
+r18 | fangq | 2009-03-15 10:47:45 -0400 (Sun, 15 Mar 2009) | 1 line
+Changed paths:
+   M /mcextreme_cuda/trunk/src/logistic_rand.cu
+   M /mcextreme_cuda/trunk/src/mcextreme.cu
+
+use ring5 logistic RNG
+------------------------------------------------------------------------
+r17 | fangq | 2009-03-05 16:49:07 -0500 (Thu, 05 Mar 2009) | 1 line
+Changed paths:
+   M /mcextreme_cuda/trunk/src/Makefile
+   M /mcextreme_cuda/trunk/src/logistic_rand.cu
+   M /mcextreme_cuda/trunk/src/mcextreme.cu
+
+avoid type casting, making it even faster
+------------------------------------------------------------------------
+r16 | fangq | 2009-03-03 18:03:27 -0500 (Tue, 03 Mar 2009) | 1 line
+Changed paths:
+   M /mcextreme_cuda/trunk/src/Makefile
+   M /mcextreme_cuda/trunk/src/mcextreme.cu
+
+drop sub-byte media cache support
+------------------------------------------------------------------------
+r15 | fangq | 2009-03-02 20:28:07 -0500 (Mon, 02 Mar 2009) | 1 line
+Changed paths:
+   A /mcextreme_cuda/trunk/src/logistic_rand.cu
+
+add logistic map RNG, 16% faster than MT
+------------------------------------------------------------------------
+r14 | fangq | 2009-03-02 20:27:54 -0500 (Mon, 02 Mar 2009) | 1 line
+Changed paths:
+   M /mcextreme_cuda/trunk/src/Makefile
+   M /mcextreme_cuda/trunk/src/mcextreme.cu
+   M /mcextreme_cuda/trunk/src/mt_rand_s.cu
+
+add logistic map RNG, 16% faster than MT
+------------------------------------------------------------------------
+r13 | fangq | 2009-02-28 12:39:00 -0500 (Sat, 28 Feb 2009) | 1 line
+Changed paths:
+   M /mcextreme_cuda/trunk/src/mcextreme.cu
+
+dynamically allocate total thread numbers
+------------------------------------------------------------------------
+r12 | fangq | 2009-02-28 12:18:46 -0500 (Sat, 28 Feb 2009) | 1 line
+Changed paths:
+   M /mcextreme_cuda/trunk/src/mcextreme.cu
+
+tested with while loop, and gave up
+------------------------------------------------------------------------
+r11 | fangq | 2009-02-27 18:46:12 -0500 (Fri, 27 Feb 2009) | 1 line
+Changed paths:
+   M /mcextreme_cuda/trunk/src/Makefile
+   M /mcextreme_cuda/trunk/src/mcextreme.cu
+
+fixes to the reflection coefficients
+------------------------------------------------------------------------
+r10 | fangq | 2009-02-27 13:19:54 -0500 (Fri, 27 Feb 2009) | 1 line
+Changed paths:
+   M /mcextreme_cuda/trunk/src/mcextreme.cu
+
+early support of boundary reflection
+------------------------------------------------------------------------
+r9 | fangq | 2009-02-26 22:48:24 -0500 (Thu, 26 Feb 2009) | 1 line
+Changed paths:
+   M /mcextreme_cuda/trunk/src/mcextreme.cu
+
+register and constant memory optimization
+------------------------------------------------------------------------
+r8 | fangq | 2009-02-26 21:42:18 -0500 (Thu, 26 Feb 2009) | 1 line
+Changed paths:
+   M /mcextreme_cuda/trunk/src/mcextreme.cu
+
+minor change for GPUSINCOS macro
+------------------------------------------------------------------------
+r7 | fangq | 2009-02-26 21:38:36 -0500 (Thu, 26 Feb 2009) | 1 line
+Changed paths:
+   M /mcextreme_cuda/trunk/src/mcextreme.cu
+
+merge all FAST_MATH functions
+------------------------------------------------------------------------
+r6 | fangq | 2009-02-26 21:26:37 -0500 (Thu, 26 Feb 2009) | 1 line
+Changed paths:
+   M /mcextreme_cuda/trunk/src/Makefile
+   M /mcextreme_cuda/trunk/src/br2cu.h
+   M /mcextreme_cuda/trunk/src/mcextreme.cu
+
+support subdomain and air voxels
+------------------------------------------------------------------------
+r5 | fangq | 2009-02-25 09:55:17 -0500 (Wed, 25 Feb 2009) | 1 line
+Changed paths:
+   M /mcextreme_cuda/trunk/src/mcextreme.cu
+
+compressed media bits in cpu
+------------------------------------------------------------------------
+r4 | fangq | 2009-02-24 22:25:33 -0500 (Tue, 24 Feb 2009) | 1 line
+Changed paths:
+   M /mcextreme_cuda/trunk/src/Makefile
+   M /mcextreme_cuda/trunk/src/mcextreme.cu
+
+media use 1 byte index
+------------------------------------------------------------------------
+r3 | fangq | 2009-02-24 21:43:10 -0500 (Tue, 24 Feb 2009) | 1 line
+Changed paths:
+   D /mcextreme_cuda/trunk/Makefile
+   D /mcextreme_cuda/trunk/br2cu.h
+   D /mcextreme_cuda/trunk/mcextreme.cu
+   D /mcextreme_cuda/trunk/mt_rand_s.cu
+   A /mcextreme_cuda/trunk/src/Makefile (from /mcextreme_cuda/trunk/Makefile:1)
+   A /mcextreme_cuda/trunk/src/br2cu.h (from /mcextreme_cuda/trunk/br2cu.h:1)
+   A /mcextreme_cuda/trunk/src/mcextreme.cu (from /mcextreme_cuda/trunk/mcextreme.cu:1)
+   A /mcextreme_cuda/trunk/src/mt_rand_s.cu (from /mcextreme_cuda/trunk/mt_rand_s.cu:1)
+   A /mcextreme_cuda/trunk/src/tictoc.h (from /mcextreme_cuda/trunk/tictoc.h:1)
+   D /mcextreme_cuda/trunk/tictoc.h
+
+use directory structure
+------------------------------------------------------------------------
+r2 | fangq | 2009-02-24 21:41:14 -0500 (Tue, 24 Feb 2009) | 1 line
+Changed paths:
+   A /mcextreme_cuda/trunk/bin
+   A /mcextreme_cuda/trunk/doc
+   A /mcextreme_cuda/trunk/example
+   A /mcextreme_cuda/trunk/src
+
+add directory structures
+------------------------------------------------------------------------
+r1 | fangq | 2009-02-24 21:37:09 -0500 (Tue, 24 Feb 2009) | 1 line
+Changed paths:
+   A /mcextreme_cuda
+   A /mcextreme_cuda/trunk
+   A /mcextreme_cuda/trunk/ChangeLog.txt
+   A /mcextreme_cuda/trunk/LICENSE.txt
+   A /mcextreme_cuda/trunk/Makefile
+   A /mcextreme_cuda/trunk/README.txt
+   A /mcextreme_cuda/trunk/br2cu.h
+   A /mcextreme_cuda/trunk/mcextreme.cu
+   A /mcextreme_cuda/trunk/mt_rand_s.cu
+   A /mcextreme_cuda/trunk/tictoc.h
+
+MCX initial import
+------------------------------------------------------------------------
